@@ -1,6 +1,6 @@
 {
-    "name": "rtf.js",
-    "version": "3.0.9",
+    "name": "betterrtf",
+    "version": "0.0.1",
     "description": "Render RTF documents in HTML. This also includes rendering WMF and EMF images which are often contained in RTF documents.",
     "main": "index.js",
     "types": "./dist/src",
@@ -21,17 +21,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/tbluemel/rtf.js.git"
+        "url": "git+https://github.com/furknozg/betterrtf.git"
     },
     "keywords": [
         "RTF"
     ],
-    "author": "Thomas Bluemel",
+    "author": "Furkan Özgültekin",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/tbluemel/rtf.js/issues"
+        "url": "https://github.com/furknozg/betterrtf/issues"
     },
-    "homepage": "https://github.com/tbluemel/rtf.js#readme",
+    "homepage": "https://github.com/furknozg/betterrtf#readme",
     "devDependencies": {
         "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
         "@typescript-eslint/eslint-plugin": "^5.19.0",
