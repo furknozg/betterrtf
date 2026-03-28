@@ -26,16 +26,16 @@ SOFTWARE.
 
 import { Document } from "../../Document";
 import { Helper, RTFJSError } from "../../Helper";
-import { RenderChp } from "../../renderer/RenderChp";
+import { RenderTableContainer } from "../../renderer/RenderElements";
 import { Renderer } from "../../renderer/Renderer";
-import { RenderPap } from "../../renderer/RenderPap";
-import { Chp, GlobalState, Pap, Sep } from "../Containers";
+import {Chp, Dop, GlobalState, Pap, Sep, Tbl} from "../Containers";
 import { DestinationBase } from "./DestinationBase";
 
 export class RtfDestination extends DestinationBase {
     private _metadata: { [key: string]: any };
     private parser: GlobalState;
     private inst: Document;
+    private _propchanged: { chp: Chp, pap: Pap, sep: Sep, dop: Dop, [key: string]: any };
     private _charFormatHandlers: { [key: string]: (param: number) => void } = {
         ansicpg: (param: number) => {
             // if the value is 0, use the default charset as 0 is not valid
@@ -121,11 +121,99 @@ export class RtfDestination extends DestinationBase {
         facingp: this._genericFormatSetNoParam("dop", "facingpages", true),
         landscape: this._genericFormatSetNoParam("dop", "landscape", true),
         par: this._addInsHandler((renderer) => {
-            renderer.startPar();
+            renderer.finishPar();
         }),
         line: this._addInsHandler((renderer) => {
             renderer.lineBreak();
         }),
+        trowd: () => {
+            if (this.parser.state.table != null && this.parser.state.table.hasOpenRow()) {
+                this._finishTableRow();
+                this.parser.state.table.finalizeRow();
+            }
+
+            if (this.parser.state.table == null) {
+                this.parser.state.table = new Tbl();
+                Helper.log("[rtf] state.pap.table initialized");
+                const table = this.parser.state.table;
+                this.inst.addIns((renderer) => {
+                    renderer.pushContainer(new RenderTableContainer(renderer._doc, table));
+                });
+            }
+
+            this.parser.state.table.startRow();
+        },
+        trleft: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setRowLeft(param);
+        },
+        cellx: (param: number) => {
+            if (param == null) {
+                throw new RTFJSError("cellx without required param");
+            }
+            this.parser.state.table.setCellRight(param);
+        },
+        intbl: this._genericFormatSetNoParam("pap", "intable", true),
+        row: () => {
+            this.parser.state.pap.isrow = true;
+            if (this.parser.state.table != null) {
+                this._finishTableRow();
+                this.parser.state.table.finalizeRow();
+            }
+            this.parser.state.pap.intable = false;
+        },
+        cell: () => {
+            if (this.parser.state.table != null) {
+                this._finishTableCell();
+            }
+        },
+        clvmgf: () => {
+            this.parser.state.table.setVerticalMergeStart();
+        },
+        clvmrg: () => {
+            this.parser.state.table.setVerticalMergeContinue();
+        },
+        clmgf: () => {
+            this.parser.state.table.setMergeStart();
+        },
+        clmrg: () => {
+            this.parser.state.table.setMergeContinue();
+        },
+        clbrdrt: () => {
+            this.parser.state.table.beginBorder("top");
+        },
+        clbrdrl: () => {
+            this.parser.state.table.beginBorder("left");
+        },
+        clbrdrb: () => {
+            this.parser.state.table.beginBorder("bottom");
+        },
+        clbrdrr: () => {
+            this.parser.state.table.beginBorder("right");
+        },
+        brdrs: () => {
+            this.parser.state.table.setBorderStyle("solid");
+        },
+        brdrth: () => {
+            this.parser.state.table.setBorderStyle("solid");
+        },
+        brdrdb: () => {
+            this.parser.state.table.setBorderStyle("double");
+        },
+        brdrw: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setBorderWidth(param);
+        },
+        brdrcf: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setBorderColorIndex(param);
+        },
     };
 
     constructor(parser: GlobalState, inst: Document, name: string, param: number) {
@@ -141,6 +229,12 @@ export class RtfDestination extends DestinationBase {
         parser.version = 1;
 
         this._metadata = {};
+        this._propchanged = {
+            chp: null,
+            pap: null,
+            sep: null,
+            dop: null,
+        };
         this.parser = parser;
         this.inst = inst;
     }
@@ -150,6 +244,14 @@ export class RtfDestination extends DestinationBase {
     }
 
     public appendText(text: string): void {
+        if (this.parser.state.pap.intable) {
+            if (this.parser.state.table == null) {
+                Helper.log("[rtf] ignoring dangling intbl flag without table definition");
+            }
+        } else if (this.parser.state.table != null) {
+            Helper.log("[rtf] TABLE END");
+            this.parser.state.table = null;
+        }
         Helper.log("[rtf] output: " + text);
         this.inst.addIns(text);
     }
@@ -169,6 +271,7 @@ export class RtfDestination extends DestinationBase {
 
     public apply(): void {
         Helper.log("[rtf] apply()");
+        this.flushProps();
         for (const prop in this._metadata) {
             this.inst._meta[prop] = this._metadata[prop];
         }
@@ -189,20 +292,61 @@ export class RtfDestination extends DestinationBase {
         Helper.log("[rtf] update " + ptype);
         switch (ptype) {
             case "chp": {
-                const rchp = new RenderChp(new Chp(props as Chp));
+                const chp = new Chp(props as Chp);
                 this.inst.addIns((renderer) => {
-                    renderer.setChp(rchp);
+                    renderer.setChp(chp);
                 });
                 break;
             }
             case "pap": {
-                const rpap = new RenderPap(new Pap(props as Pap));
+                const pap = new Pap(props as Pap);
                 this.inst.addIns((renderer) => {
-                    renderer.setPap(rpap);
+                    renderer.setPap(pap);
                 });
                 break;
             }
         }
+    }
+
+    private _updateFormatIns(ptype: string, props: any) {
+        const changed = this._propchanged[ptype];
+        const classes: {[key: string]: any} = {chp: Chp, pap: Pap, sep: Sep, dop: Dop};
+        if (changed == null) {
+            this._propchanged[ptype] = new classes[ptype](props);
+        }
+        if (changed !== props) {
+            this._propchanged[ptype] = new classes[ptype](props);
+            this._addFormatIns(ptype, props);
+        }
+    }
+
+    private flushProps(ptype?: string) {
+        if (ptype != null) {
+            const changed = this._propchanged[ptype];
+            if (changed != null) {
+                this._propchanged[ptype] = null;
+                this._addFormatIns(ptype, changed);
+            }
+        } else {
+            this.flushProps("chp");
+            this.flushProps("pap");
+            this.flushProps("sep");
+            this.flushProps("dop");
+        }
+    }
+
+    private _finishTableRow() {
+        Helper.log("[rtf] finalize table row");
+        this.inst.addIns((renderer) => {
+            renderer.finishRow();
+        });
+    }
+
+    private _finishTableCell() {
+        Helper.log("[rtf] finalize table cell");
+        this.inst.addIns((renderer) => {
+            renderer.finishCell();
+        });
     }
 
     private _genericFormatSetNoParam(ptype: string, prop: string, val: any) {
@@ -210,7 +354,7 @@ export class RtfDestination extends DestinationBase {
             const props = this.parser.state[ptype];
             props[prop] = val;
             Helper.log("[rtf] state." + ptype + "." + prop + " = " + props[prop].toString());
-            this._addFormatIns(ptype, props);
+            this._updateFormatIns(ptype, props);
         };
     }
 
@@ -220,7 +364,7 @@ export class RtfDestination extends DestinationBase {
             props[prop] = (param == null || param !== 0)
                 ? (onval != null ? onval : true) : (offval != null ? offval : false);
             Helper.log("[rtf] state." + ptype + "." + prop + " = " + props[prop].toString());
-            this._addFormatIns(ptype, props);
+            this._updateFormatIns(ptype, props);
         };
     }
 
@@ -229,7 +373,7 @@ export class RtfDestination extends DestinationBase {
             const props = this.parser.state[ptype];
             props[prop] = (param == null) ? defaultval : param;
             Helper.log("[rtf] state." + ptype + "." + prop + " = " + props[prop].toString());
-            this._addFormatIns(ptype, props);
+            this._updateFormatIns(ptype, props);
         };
     }
 
@@ -241,7 +385,7 @@ export class RtfDestination extends DestinationBase {
             const props = this.parser.state[ptype];
             props[prop] = param;
             Helper.log("[rtf] state." + ptype + "." + prop + " = " + props[prop].toString());
-            this._addFormatIns(ptype, props);
+            this._updateFormatIns(ptype, props);
         };
     }
 
@@ -251,7 +395,8 @@ export class RtfDestination extends DestinationBase {
             const members = props[prop];
             members[member] = (param == null) ? defaultval : param;
             Helper.log("[rtf] state." + ptype + "." + prop + "." + member + " = " + members[member].toString());
-            this._addFormatIns(ptype, props);
+            this._updateFormatIns(ptype, props);
         };
     }
+
 }

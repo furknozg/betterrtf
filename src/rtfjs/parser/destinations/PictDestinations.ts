@@ -228,7 +228,7 @@ export class PictDestination extends DestinationTextBase {
                     if (typeof pictrender === "string") {
                         Helper.log("[pict] Could not load image: " + pictrender);
                         if (render) {
-                            return renderer.buildPicture(pictrender, null);
+                            return renderer.buildPicture(pictrender, null).getElement().get(0);
                         } else {
                             inst.addIns((rendererForPicture) => {
                                 rendererForPicture.picture(pictrender, null);
@@ -239,7 +239,7 @@ export class PictDestination extends DestinationTextBase {
                             throw new RTFJSError("Expected a picture render function");
                         }
                         if (render) {
-                            return renderer.buildRenderedPicture(pictrender());
+                            return renderer.buildRenderedPicture(pictrender()).getElement().get(0);
                         } else {
                             inst.addIns((rendererForPicture) => {
                                 rendererForPicture.renderedPicture(pictrender());
@@ -272,7 +272,7 @@ export class PictDestination extends DestinationTextBase {
                 const bin = blob != null ? Helper._blobToBinary(blob) : Helper._hexToBinary(text);
                 if (type !== "") {
                     if (render) {
-                        return renderer.buildPicture(type as string, bin);
+                        return renderer.buildPicture(type as string, bin).getElement().get(0);
                     } else {
                         renderer._doc.addIns((rendererForPicture) => {
                             rendererForPicture.picture(type as string, bin);
@@ -280,7 +280,7 @@ export class PictDestination extends DestinationTextBase {
                     }
                 } else {
                     if (render) {
-                        return renderer.buildPicture("Unsupported image format", null);
+                        return renderer.buildPicture("Unsupported image format", null).getElement().get(0);
                     } else {
                         renderer._doc.addIns((rendererForPicture) => {
                             rendererForPicture.picture("Unsupported image format", null);

@@ -1,4 +1,4 @@
-# rtf.js
+# betterrtf
 [![Build Status](https://travis-ci.org/tbluemel/rtf.js.svg?branch=master)](https://travis-ci.org/tbluemel/rtf.js)
 [![Coverage Status](https://coveralls.io/repos/github/tbluemel/rtf.js/badge.svg?branch=master)](https://coveralls.io/github/tbluemel/rtf.js?branch=master)
 [![npm version](https://badge.fury.io/js/rtf.js.svg)](https://badge.fury.io/js/rtf.js)

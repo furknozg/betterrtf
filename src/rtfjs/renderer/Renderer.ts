@@ -24,10 +24,14 @@ SOFTWARE.
 
 */
 
+import * as $ from "jquery";
 import { Document } from "../Document";
 import { RTFJSError } from "../Helper";
-import { RenderChp } from "./RenderChp";
-import { RenderPap } from "./RenderPap";
+import { Chp, Pap } from "../parser/Containers";
+import {
+    RenderContainer, RenderElement, RenderParagraphContainer, RenderTableContainer,
+    RenderTextElement,
+} from "./RenderElements";
 
 export interface IContainerElement {
     element: HTMLElement;
@@ -37,47 +41,70 @@ export interface IContainerElement {
 export class Renderer {
     public _doc: Document;
     private _dom: HTMLElement[];
-
-    private _curRChp: RenderChp;
-    private _curRPap: RenderPap;
-    private _curpar: HTMLElement;
-    private _cursubpar: HTMLElement;
-    private _curcont: IContainerElement[];
+    private _chp: Chp;
+    private _pap: Pap;
+    private _curpar: Array<RenderElement | RenderContainer>;
+    private _cursubparIdx: number;
+    private _curcont: RenderContainer[];
 
     constructor(doc: Document) {
         this._doc = doc;
         this._dom = null;
-
-        this._curRChp = null;
-        this._curRPap = null;
-        this._curpar = null;
-        this._cursubpar = null;
-        this._curcont = [];
     }
 
-    public pushContainer(contel: IContainerElement): void {
-        if (this._curpar == null) {
-            this.startPar();
-        }
-
-        const len = this._curcont.push(contel);
+    public pushContainer(container: RenderContainer) {
+        const len = this._curcont.push(container);
         if (len > 1) {
-            const prevcontel = this._curcont[len - 1];
-            prevcontel.content.append(contel.element);
+            const prevcontel = this._curcont[len - 2];
+            prevcontel.appendSub(container);
         } else {
-            if (this._cursubpar != null) {
-                this._cursubpar.append(contel.element);
+            if (this._cursubparIdx >= 0) {
+                const par = this._curpar[this._cursubparIdx] as RenderContainer;
+                par.appendSub(container);
             } else {
-                this._curpar.append(contel.element);
+                this._curpar.push(container);
             }
         }
     }
 
-    public popContainer(): void {
-        const contel = this._curcont.pop();
-        if (contel == null) {
-            throw new RTFJSError("No container on rendering stack");
+    public currentContainer(type: string) {
+        const len = this._curcont.length;
+        if (len === 0) {
+            return null;
         }
+        if (type != null) {
+            for (let i = len - 1; i >= 0; i--) {
+                const cont = this._curcont[i];
+                if (cont.getType() === type) {
+                    return cont;
+                }
+            }
+            return null;
+        }
+        return this._curcont[len - 1];
+    }
+
+    public popContainer(type?: string) {
+        let cont;
+        if (type != null) {
+            let popped = false;
+            while (this._curcont.length > 0) {
+                cont = this._curcont.pop();
+                if (cont.getType() === type) {
+                    popped = true;
+                    break;
+                }
+            }
+            if (!popped) {
+                throw new RTFJSError("No container of type " + type + " on rendering stack");
+            }
+        } else {
+            cont = this._curcont.pop();
+            if (cont == null) {
+                throw new RTFJSError("No container on rendering stack");
+            }
+        }
+        return cont;
     }
 
     public buildHyperlinkElement(url: string): HTMLElement {
@@ -86,98 +113,113 @@ export class Renderer {
         return link;
     }
 
-    public _appendToPar(el: HTMLElement, newsubpar?: boolean): void {
-        if (this._curpar == null) {
-            this.startPar();
-        }
+    public _appendToPar(content: RenderElement | null, newsubpar?: boolean) {
         if (newsubpar === true) {
-            let subpar: HTMLDivElement = document.createElement("div");
-            if (this._cursubpar == null) {
-                subpar.append(...Array.from(this._curpar.childNodes));
-                this._curpar.append(subpar);
-                subpar = document.createElement("div");
+            // Move everything in _curpar since the last sub-paragraph into a new one
+            let par = new RenderParagraphContainer(this._doc);
+            const len = this._curpar.length;
+            for (let i = this._cursubparIdx + 1; i < len; i++) {
+                par.appendSub(this._curpar[i]);
             }
-            if (el) {
-                subpar.append(el);
+            this._curpar.splice(this._cursubparIdx + 1, len - this._cursubparIdx - 1);
+            par.updateProps(this._pap, this._chp);
+            this._curpar.push(par);
+
+            // Add a new sub-paragraph
+            par = new RenderParagraphContainer(this._doc);
+            this._cursubparIdx = this._curpar.push(par) - 1;
+            par.updateProps(this._pap, this._chp);
+
+            if (content != null) {
+                this._curpar.push(content);
             }
-            if (this._curRPap != null) {
-                this._curRPap.apply(this._doc, subpar, this._curRChp, false);
+        } else if (content != null) {
+            if (this._cursubparIdx < 0) {
+                const par = new RenderParagraphContainer(this._doc);
+                this._cursubparIdx = this._curpar.push(par) - 1;
+                par.updateProps(this._pap, this._chp);
+            }
+            if (this._curcont.length > 0 && this._curcont[this._curcont.length - 1] instanceof RenderTableContainer
+                && this._pap.intable === false) {
+                this._curcont.pop();
             }
 
-            this._cursubpar = subpar;
-            this._curpar.append(subpar);
-        } else if (el) {
             const contelCnt = this._curcont.length;
             if (contelCnt > 0) {
-                this._curcont[contelCnt - 1].content.append(el);
-            } else if (this._cursubpar != null) {
-                this._cursubpar.append(el);
+                this._curcont[contelCnt - 1].appendSub(content as RenderContainer);
+            } else if (this._cursubparIdx >= 0) {
+                (this._curpar[this._cursubparIdx] as RenderContainer).appendSub(content as RenderContainer);
             } else {
-                this._curpar.append(el);
+                this._curpar.push(content);
             }
         }
     }
 
-    public startPar(): void {
-        this._curpar = document.createElement("div");
-        if (this._curRPap != null) {
-            this._curRPap.apply(this._doc, this._curpar, this._curRChp, true);
-            this._curRPap.apply(this._doc, this._curpar, this._curRChp, false);
-        }
-        this._cursubpar = null;
-        this._curcont = [];
-        this._dom.push(this._curpar);
+    public finishPar(): void {
+        this._appendToPar(null, true);
     }
 
     public lineBreak(): void {
         this._appendToPar(null, true);
     }
 
-    public setChp(rchp: RenderChp): void {
-        this._curRChp = rchp;
+    public finishRow(): void {
+        const table = this.currentContainer("table") as RenderTableContainer;
+        if (table == null) {
+            return;
+        }
+        table.finishRow();
     }
 
-    public setPap(rpap: RenderPap): void {
-        this._curRPap = rpap;
-        if (this._cursubpar != null) {
-            this._curRPap.apply(this._doc, this._cursubpar, null, false);
-        } else if (this._curpar != null) {
-            // Don't have a sub-paragraph at all, apply everything
-            this._curRPap.apply(this._doc, this._curpar, null, true);
-            this._curRPap.apply(this._doc, this._curpar, null, false);
+    public finishCell(): void {
+        const table = this.currentContainer("table") as RenderTableContainer;
+        if (table == null) {
+            return;
+        }
+        table.finishCell();
+    }
+
+    public setChp(chp: Chp): void {
+        this._chp = chp;
+    }
+
+    public setPap(pap: Pap): void {
+        this._pap = pap;
+        if (this._cursubparIdx >= 0) {
+            this._curpar[this._cursubparIdx].updateProps(this._pap, this._chp);
         }
     }
 
-    public appendElement(element: HTMLElement): void {
-        this._appendToPar(element);
+    public appendElement(element: JQuery | HTMLElement): void {
+        this._appendToPar(new RenderElement(this._doc, "element", element));
     }
 
-    public buildRenderedPicture(element: HTMLElement): HTMLElement {
+    public buildRenderedPicture(element: JQuery | HTMLElement): RenderElement {
         if (element == null) {
             element = document.createElement("span");
             element.textContent = "[failed to render image]";
         }
-        return element;
+        return new RenderElement(this._doc, "picture", element);
     }
 
-    public renderedPicture(element: HTMLElement): void {
+    public renderedPicture(element: JQuery | HTMLElement): void {
         this._appendToPar(this.buildRenderedPicture(element));
     }
 
-    public buildPicture(mime: string, data: string): HTMLElement {
+    public buildPicture(mime: string, data: string): RenderElement {
+        let element;
         if (data != null) {
-            const image: HTMLImageElement = document.createElement("img");
-            image.src = "data:" + mime + ";base64," + btoa(data);
-            return image;
+            element = $("<img>", {
+                src: "data:" + mime + ";base64," + btoa(data),
+            });
         } else {
             let err = "image type not supported";
             if (typeof mime === "string" && mime !== "") {
                 err = mime;
             }
-            const span: HTMLSpanElement = document.createElement("span");
-            span.textContent = "[" + err + "]";
-            return span;
+            element = $("<span>").text("[" + err + "]");
         }
+        return new RenderElement(this._doc, "picture", element);
     }
 
     public picture(mime: string, data: string): void {
@@ -191,24 +233,31 @@ export class Renderer {
 
         this._dom = [];
 
-        this._curRChp = null;
-        this._curRPap = null;
-        this._curpar = null;
+        this._chp = null;
+        this._pap = null;
+        this._curpar = [];
+        this._cursubparIdx = -1;
+        this._curcont = [];
 
-        const len = this._doc._ins.length;
+        let len = this._doc._ins.length;
         for (let i = 0; i < len; i++) {
             const ins = this._doc._ins[i];
             if (typeof ins === "string") {
-                const span: HTMLSpanElement = document.createElement("span");
-                span.textContent = ins;
-                if (this._curRChp != null) {
-                    this._curRChp.apply(this._doc, span);
-                }
-                this._appendToPar(span);
+                this._appendToPar(new RenderTextElement(this._doc, ins, this._chp));
             } else {
                 ins(this);
             }
         }
+
+        len = this._curpar.length;
+        for (let i = 0; i < len; i++) {
+            // At this point all render elements have been wrapped in RenderParagraphContainer objects
+            const element = this._curpar[i].finalize();
+            if (element) {
+                this._dom.push(element.get(0));
+            }
+        }
+
         return this._dom;
     }
 }

@@ -27,13 +27,11 @@ SOFTWARE.
 import cptable from "codepage";
 import { Document } from "../Document";
 import { Helper, RTFJSError } from "../Helper";
-import { RenderChp } from "../renderer/RenderChp";
 import { Renderer } from "../renderer/Renderer";
-import { RenderPap } from "../renderer/RenderPap";
-import { GlobalState, HexText, PlainText, State } from "./Containers";
+import { Chp, GlobalState, HexText, Pap, PlainText, State } from "./Containers";
 import { DestinationFactory } from "./destinations/DestinationBase";
 import { Destinations } from "./destinations/Destinations";
-import { FonttblDestinationSub } from "./destinations/FonttblDestinations"
+import { FonttblDestinationSub } from "./destinations/FonttblDestinations";
 
 export class Parser {
     private inst: Document;
@@ -201,10 +199,10 @@ export class Parser {
         if (this.parser.state !== null) {
             const currentState = this.parser.state;
             this.inst._ins.push((renderer) => {
-                renderer.setChp(new RenderChp(currentState.chp));
+                renderer.setChp(new Chp(currentState.chp));
             });
             this.inst._ins.push((renderer) => {
-                renderer.setPap(new RenderPap(currentState.pap));
+                renderer.setPap(new Pap(currentState.pap));
             });
         }
         return this.parser.state;
