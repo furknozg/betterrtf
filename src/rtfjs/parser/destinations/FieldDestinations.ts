@@ -55,7 +55,7 @@ export class FieldDestination extends DestinationBase {
         this._result = null;
     }
 
-    public apply() {
+    public apply(): void {
         if (!this._haveInst) {
             throw new RTFJSError("IField has no fldinst destination");
         }
@@ -64,7 +64,7 @@ export class FieldDestination extends DestinationBase {
         //     throw new RTFJSError("IField has no fldrslt destination");
     }
 
-    public setInst(inst: IField | Promise<IField | null>) {
+    public setInst(inst: IField | Promise<IField | null>): void {
         this._haveInst = true;
         if (this._parsedInst != null) {
             throw new RTFJSError("IField cannot have multiple fldinst destinations");
@@ -81,11 +81,11 @@ export class FieldDestination extends DestinationBase {
         }
     }
 
-    public getInst() {
+    public getInst(): IField {
         return this._parsedInst;
     }
 
-    public setResult(inst: FldrsltDestination) {
+    public setResult(inst: FldrsltDestination): void {
         if (this._result != null) {
             throw new RTFJSError("IField cannot have multiple fldrslt destinations");
         }
@@ -93,14 +93,14 @@ export class FieldDestination extends DestinationBase {
     }
 }
 
-export class FieldBase {
+class FieldBase {
     private _fldinst: FldinstDestination;
 
     constructor(fldinst: FldinstDestination) {
         this._fldinst = fldinst;
     }
 
-    public renderFieldEnd(field: FieldDestination, rtf: RtfDestination, records: number) {
+    public renderFieldEnd(field: FieldDestination, rtf: RtfDestination, records: number): void {
         if (records > 0) {
             rtf.addIns((renderer) => {
                 Helper.log("[rtf] Popping container");
@@ -110,7 +110,7 @@ export class FieldBase {
     }
 }
 
-export class FieldHyperlink extends FieldBase {
+class FieldHyperlink extends FieldBase {
     private _url: string;
 
     constructor(fldinst: FldinstDestination, data: string) {
@@ -118,11 +118,12 @@ export class FieldHyperlink extends FieldBase {
         this._url = data;
     }
 
-    public url() {
+    public url(): string {
         return this._url;
     }
 
-    public renderFieldBegin(field: FieldDestination, rtf: RtfDestination, records: number) {
+    public renderFieldBegin(field: FieldDestination, rtf: RtfDestination, records: number): boolean {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         if (records > 0) {
             rtf.addIns((renderer) => {
@@ -165,7 +166,7 @@ export class FldinstDestination extends DestinationTextBase {
         this.inst = inst;
     }
 
-    public apply() {
+    public apply(): void {
         const field = findParentDestination(this.parser, "field") as FieldDestination;
         if (field == null) {
             throw new RTFJSError("fldinst destination must be child of field destination");
@@ -174,6 +175,7 @@ export class FldinstDestination extends DestinationTextBase {
     }
 
     private parseType() {
+        this.text = this.text.trim();
         const sep = this.text.indexOf(" ");
         if (sep > 0) {
             let data = this.text.substr(sep + 1);
@@ -197,7 +199,7 @@ export class FldinstDestination extends DestinationTextBase {
                             const hook = inst._settings.onPicture;
                             inst._settings.onPicture = null;
 
-                            // tslint:disable-next-line:prefer-const
+                            // eslint-disable-next-line prefer-const
                             let {isLegacy, element} = pict.apply(true);
 
                             // restore
@@ -256,6 +258,7 @@ export class FldinstDestination extends DestinationTextBase {
                         this.parser._asyncTasks.push(promise);
                         return promise;
                     }
+                    break;
                 default:
                     Helper.log("[fldinst]: unknown field type: " + fieldType);
                     break;
@@ -269,7 +272,7 @@ export class FldrsltDestination extends DestinationFormattedTextBase {
         super(parser, "fldrslt");
     }
 
-    public apply() {
+    public apply(): void {
         const field = findParentDestination(this.parser, "field") as FieldDestination;
         if (field != null) {
             field.setResult(this);
@@ -278,7 +281,7 @@ export class FldrsltDestination extends DestinationFormattedTextBase {
         super.apply();
     }
 
-    public renderBegin(rtf: RtfDestination, records: number) {
+    public renderBegin(rtf: RtfDestination, records: number): boolean {
         const field = findParentDestination(this.parser, "field") as FieldDestination;
         if (field != null) {
             const inst = field.getInst();
@@ -289,7 +292,7 @@ export class FldrsltDestination extends DestinationFormattedTextBase {
         return false;
     }
 
-    public renderEnd(rtf: RtfDestination, records: number) {
+    public renderEnd(rtf: RtfDestination, records: number): void {
         const field = findParentDestination(this.parser, "field") as FieldDestination;
         if (field != null) {
             const inst = field.getInst();

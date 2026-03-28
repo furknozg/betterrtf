@@ -28,10 +28,10 @@ import cptable from "codepage";
 import { Document } from "../Document";
 import { Helper, RTFJSError } from "../Helper";
 import { Renderer } from "../renderer/Renderer";
-import { SymbolTable } from "../Symboltable";
-import { Chp, GlobalState, Pap, State } from "./Containers";
+import { Chp, GlobalState, HexText, Pap, PlainText, State } from "./Containers";
 import { DestinationFactory } from "./destinations/DestinationBase";
 import { Destinations } from "./destinations/Destinations";
+import { FonttblDestinationSub } from "./destinations/FonttblDestinations";
 
 export class Parser {
     private inst: Document;
@@ -45,7 +45,9 @@ export class Parser {
     public parse(): Promise<void> {
         if (this.parser.data.length > 1 && String.fromCharCode(this.parser.data[0]) === "{") {
             this.parseLoop(false, true);
-            return Promise.all(this.parser._asyncTasks).then(() => { return; });
+            return Promise.all(this.parser._asyncTasks).then(() => {
+                return;
+            });
         }
         if (this.parser.version == null) {
             throw new RTFJSError("Not a valid rtf document");
@@ -108,11 +110,61 @@ export class Parser {
             if (dest == null) {
                 throw new RTFJSError("Cannot route text to destination");
             }
-            if (dest != null && dest.appendText != null && !this.parser.state.skipdestination) {
-                dest.appendText(this.parser.text);
+
+            let summarizedText = "";
+            if (dest.appendText != null && !this.parser.state.skipdestination) {
+                if (dest instanceof FonttblDestinationSub) {
+                    summarizedText = this.summarizeText(this.parser.text, dest.charset);
+                }
+                else {
+                    summarizedText = this.summarizeText(this.parser.text);
+                }
+                dest.appendText(summarizedText);
             }
-            this.parser.text = "";
+            this.parser.text = [];
         }
+    }
+
+    private summarizeText(text: (PlainText | HexText)[], charset?: number) {
+        let result = "";
+        for (let i = 0; i < text.length; i++) {
+            const value = text[i];
+            if (value instanceof PlainText) {
+                result += value.text;
+            } else if (value instanceof HexText) {
+                // Looking for current fonttbl charset
+                let codepage = charset ? charset : this.parser.codepage;
+                if (Object.prototype.hasOwnProperty.call(value.chp, "fontfamily")) {
+                    const idx = value.chp.fontfamily;
+                    // Code page 42 isn't a real code page and shouldn't appear here
+                    if (this.inst._fonts !== undefined && this.inst._fonts[idx] != null
+                        && this.inst._fonts[idx].charset && this.inst._fonts[idx].charset !== 42) {
+                        codepage = this.inst._fonts[idx].charset;
+                    }
+                }
+
+                let hex = value.hex;
+                if (this.parser.state.pap.charactertype === Helper.CHARACTER_TYPE.DOUBLE
+                    || (this.parser.state.pap.charactertype == null && hex >= 0x80)) {
+                    // A reference check is sufficient for the chp instances,
+                    // as they have to be the same if they belong to one character
+                    if (i + 1 < text.length
+                        && text[i + 1] instanceof HexText && (text[i + 1] as HexText).chp === value.chp) {
+                        const doubleByteCharacterHex = hex * 0x100 + (text[i + 1] as HexText).hex;
+                        // Verify the double byte character is valid for this code page
+                        if (cptable[codepage].dec[doubleByteCharacterHex] !== undefined) {
+                            hex = doubleByteCharacterHex;
+                            // Don't process the following hex character twice
+                            i++;
+                        }
+                    }
+                }
+
+                result += cptable[codepage].dec[hex];
+            }
+        }
+
+        return result;
     }
 
     private pushState(forceSkip: boolean) {
@@ -171,7 +223,7 @@ export class Parser {
         return false;
     }
 
-    private processKeyword(keyword: string, param: number) {
+    private processKeyword(keyword: string, param: number | null) {
         const first = this.parser.state.first;
         if (first) {
             if (keyword === "*") {
@@ -189,16 +241,32 @@ export class Parser {
         // Reset if we unexpectedly encounter a keyword
         this.parser.state.skipchars = 0;
         switch (keyword) {
-            case "\n":
-                return "\n";
-            case "\r":
-                return "\r";
             case "tab":
                 return "\t";
+            case "emdash":
+                return "—";
+            case "endash":
+                return "–";
+            case "emspace":
+                return " ";
+            case "enspace":
+                return " ";
+            case "qmspace":
+                return " ";
+            case "bullet":
+                return "•";
+            case "lquote":
+                return "‘";
+            case "rquote":
+                return "’";
             case "ldblquote":
                 return "“";
             case "rdblquote":
                 return "”";
+            case "~":
+                return " ";
+            case "_":
+                return "‑";
             case "{":
             case "}":
             case "\\":
@@ -218,8 +286,16 @@ export class Parser {
                         throw new RTFJSError("Invalid unicode character encountered");
                     }
 
-                    const symbol = SymbolTable[param.toString(16).substring(2)];
-                    this.appendText(symbol !== undefined ? symbol : String.fromCharCode(param));
+                    const idx = this.parser.state.chp.fontfamily;
+                    // Code page 42 indicates a symbol, symbols between 0x0020 and 0x00ff
+                    // are mapped to the range between 0xf020 and 0xf0ff
+                    if (idx && this.inst._fonts
+                        && this.inst._fonts[idx].charset && this.inst._fonts[idx].charset === 42
+                        && param >= 0xf020 && param <= 0xf0ff) {
+                        this.appendText(new PlainText(String.fromCharCode(param - 0xf000)));
+                    } else {
+                        this.appendText(new PlainText(String.fromCharCode(param)));
+                    }
                     this.parser.state.skipchars = this.parser.state.ucn;
                 }
                 return;
@@ -238,9 +314,22 @@ export class Parser {
                 this.parseLoop(true, false); // skip the first sub destination (ansi)
                 // this will be followed by a \ud sub destination
                 return;
+
             case "ud":
+            case "ltrch":
+            case "rtlch":
                 return;
 
+            case "\n":
+            case "\r": {
+                // Carriage return and line feed must be treated like a \par, so we rewrite the keyword
+                // here and then fall through to the default behavior
+                this.parser.line++;
+                this.parser.column = 0;
+
+                keyword = "par";
+            }
+            // eslint-disable-next-line no-fallthrough
             default:
                 if (!this.parser.state.skipdestination) {
                     if (first) {
@@ -274,24 +363,32 @@ export class Parser {
         this.parser.state.skipdestination = false;
     }
 
-    private appendText(text: string) {
-        // Handle characters not found in codepage
-        text = text ? text : "";
-
+    private appendText(textData: PlainText | HexText) {
         this.parser.state.first = false;
         if (this.parser.state.skipchars > 0) {
-            const len = text.length;
-            if (this.parser.state.skipchars >= len) {
-                this.parser.state.skipchars -= len;
-                return;
-            }
+            if (textData instanceof PlainText) {
+                const len = textData.text.length;
+                if (this.parser.state.skipchars >= len) {
+                    this.parser.state.skipchars -= len;
+                    return;
+                }
 
-            if (this.parser.state.destination == null || !this.parser.state.skipdestination) {
-                this.parser.text += text.slice(this.parser.state.skipchars);
+                if (this.parser.state.destination == null || !this.parser.state.skipdestination) {
+                    this.parser.text.push(new PlainText(textData.text.slice(this.parser.state.skipchars)));
+                }
+            } else {
+                if (this.parser.state.skipchars >= 1) {
+                    this.parser.state.skipchars -= 1;
+                    return;
+                }
+
+                if (this.parser.state.destination == null || !this.parser.state.skipdestination) {
+                    this.parser.text.push(textData);
+                }
             }
             this.parser.state.skipchars = 0;
         } else if (this.parser.state.destination == null || !this.parser.state.skipdestination) {
-            this.parser.text += text;
+            this.parser.text.push(textData);
         }
     }
 
@@ -306,7 +403,7 @@ export class Parser {
             if (dest == null) {
                 throw new RTFJSError("Cannot route binary to destination");
             }
-            if (dest != null && dest.handleBlob != null && !this.parser.state.skipdestination) {
+            if (dest.handleBlob != null && !this.parser.state.skipdestination) {
                 dest.handleBlob(blob);
             }
         }
@@ -320,35 +417,22 @@ export class Parser {
         let param: number;
         let ch = this.readChar();
         if (!Helper._isalpha(ch)) {
-            if (ch === "\'") {
-                let hex = this.readChar() + this.readChar();
-                if (this.parser.state.pap.charactertype === Helper.CHARACTER_TYPE.DOUBLE) {
-                    this.readChar();
-                    this.readChar();
-                    hex += this.readChar() + this.readChar();
-                }
+            // 8 bit character encoded as hexadecimal
+            if (ch === "'") {
+                const hex = this.readChar() + this.readChar();
+
                 param = Helper._parseHex(hex);
                 if (isNaN(param)) {
                     throw new RTFJSError("Could not parse hexadecimal number");
                 }
 
                 if (process) {
-                    // Looking for current fonttbl charset
-                    let codepage = this.parser.codepage;
-                    if (this.parser.state.chp.hasOwnProperty("fontfamily")) {
-                        const idx = this.parser.state.chp.fontfamily;
-                        if (this.inst._fonts !== undefined && this.inst._fonts[idx] != null
-                            && this.inst._fonts[idx].charset !== undefined && this.inst._fonts[idx].charset != null) {
-                            codepage = this.inst._fonts[idx].charset;
-                        }
-                    }
-
-                    this.appendText(cptable[codepage].dec[param]);
+                    this.appendText(new HexText(param, this.parser.state.chp));
                 }
             } else if (process) {
-                const text = this.processKeyword(ch, param);
+                const text = this.processKeyword(ch, null);
                 if (text != null) {
-                    this.appendText(text);
+                    this.appendText(new PlainText(text));
                 }
             }
         } else {
@@ -390,7 +474,7 @@ export class Parser {
             if (process) {
                 const text = this.processKeyword(keyword, param);
                 if (text != null) {
-                    this.appendText(text);
+                    this.appendText(new PlainText(text));
                 }
             }
         }
@@ -422,14 +506,14 @@ export class Parser {
                                 break main_loop;
                             } else if (this.popState() === initialState) {
                                 break main_loop;
-                                 }
+                            }
                             break;
                         case "\\":
                             this.parseKeyword(!skip ? process : null);
                             break;
                         default:
                             if (!skip) {
-                                this.appendText(ch);
+                                this.appendText(new PlainText(ch));
                             }
                             break;
                     }

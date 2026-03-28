@@ -1,8 +1,16 @@
 const path = require('path');
-const merge = require('webpack-merge');
+const webpackMerge = require('webpack-merge');
+const merge = webpackMerge.merge || webpackMerge;
 const baseConfig = require('./base.config.js');
 
 module.exports = merge(baseConfig, {
+    mode: 'development',
+    devServer: {
+        devMiddleware: {
+            publicPath: '/dist/'
+        },
+        static: path.resolve(__dirname, '../samples')
+    },
     module: {
         rules: [
             {

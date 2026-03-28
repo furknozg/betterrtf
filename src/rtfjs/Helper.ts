@@ -26,23 +26,16 @@ SOFTWARE.
 
 import { IColor } from "./parser/destinations/ColortblDestinations";
 
-// tslint:disable-next-line:interface-name
-export interface RTFJSError {
-    name: string;
-    message: string;
-    stack: string;
+export class RTFJSError extends Error {
+    constructor(message: string) {
+        super(message); // 'Error' breaks prototype chain here
+        Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+    }
 }
 
-// tslint:disable-next-line:variable-name
-export const RTFJSError = function(this: RTFJSError, message: string) {
-    this.name = "RTFJSError";
-    this.message = message;
-    this.stack = (new Error()).stack;
-} as any as { new (message: string): RTFJSError; };
-RTFJSError.prototype = new Error();
-
 let isLoggingEnabled = true;
-export function loggingEnabled(enabled: boolean) {
+
+export function loggingEnabled(enabled: boolean): void {
     isLoggingEnabled = enabled;
 }
 
@@ -97,10 +90,14 @@ export class Helper {
         HIGHANSI: "hich",
         DOUBLE: "dbch",
     };
+    public static SUPERSUBSCRIPT = {
+        SUPERSCRIPT: 1,
+        NONE: 0,
+        SUBSCRIPT: -1,
+    };
 
-    public static log(message: string) {
+    public static log(message: string): void {
         if (isLoggingEnabled) {
-            // tslint:disable-next-line:no-console
             console.log(message);
         }
     }
@@ -110,7 +107,7 @@ export class Helper {
         for (let i = 0; i < len; i++) {
             const ch = str.charCodeAt(i);
             if (!((ch >= this._A && ch <= this._Z) ||
-                    (ch >= this._a && ch <= this._z))) {
+                (ch >= this._a && ch <= this._z))) {
                 return false;
             }
         }
@@ -133,8 +130,8 @@ export class Helper {
         for (let i = 0; i < len; i++) {
             const ch = str.charCodeAt(i);
             if (!((ch >= this._0 && ch <= this._9) ||
-                    (ch >= this._a && ch <= this._f) ||
-                    (ch >= this._A && ch <= this._F))) {
+                (ch >= this._a && ch <= this._f) ||
+                (ch >= this._A && ch <= this._F))) {
                 return NaN;
             }
         }
@@ -186,23 +183,23 @@ export class Helper {
         return this._charsetMap[idx.toString()];
     }
 
-    public static _mapColorTheme(name: string) {
+    public static _mapColorTheme(name: string): null {
         return this._colorThemeMap[name];
     }
 
-    public static _colorToStr(color: IColor) {
+    public static _colorToStr(color: IColor): string {
         return "rgb(" + color.r + "," + color.g + "," + color.b + ")";
     }
 
-    public static _twipsToPt(twips: number) {
+    public static _twipsToPt(twips: number): number {
         return Math.floor(twips / 20);
     }
 
-    public static _twipsToPx(twips: number) {
+    public static _twipsToPx(twips: number): number {
         return Math.floor(twips / 20 * 96 / 72);
     }
 
-    public static _pxToTwips(px: number) {
+    public static _pxToTwips(px: number): number {
         return Math.floor(px * 20 * 72 / 96);
     }
 
@@ -215,39 +212,40 @@ export class Helper {
     private static _0 = "0".charCodeAt(0);
     private static _9 = "9".charCodeAt(0);
 
-    private static _charsetMap: {[key: string]: number} = {
-        0:   1252, // ANSI_CHARSET
-        77:  10000, // Mac Roman
-        78:  10001, // Mac Shift Jis
-        79:  10003, // Mac Hangul
-        80:  10008, // Mac GB2312
-        81:  10002, // Mac Big5
-        83:  10005, // Mac Hebrew
-        84:  10004, // Mac Arabic
-        85:  10006, // Mac Greek
-        86:  10081, // Mac Turkish
-        87:  10021, // Mac Thai
-        88:  10029, // Mac East Europe
-        89:  10007, // Mac Russian
-        128: 932,  // SHIFTJIS_CHARSET
-        129: 949,  // HANGEUL_CHARSET
-        130: 1361, // JOHAB_CHARSET
-        134: 936,  // GB2313_CHARSET
-        136: 950,  // CHINESEBIG5_CHARSET
-        161: 1253, // GREEK_CHARSET
-        162: 1254, // TURKISH_CHARSET
-        163: 1258, // VIETNAMESE_CHARSET
-        177: 1255, // HEBREW_CHARSET
-        178: 1256, // ARABIC_CHARSET
-        186: 1257, // BALTIC_CHARSET
-        204: 1251, // RUSSIAN_CHARSET
-        222: 874,  // THAI_CHARSET
-        238: 1250, // EE_CHARSET (Eastern European)
-        254: 437,  // PC 437
-        255: 850,  // OEM
+    private static _charsetMap: { [key: string]: number } = {
+        0: 1252,  // ANSI_CHARSET
+        2: 42,    // Symbol (this is not a real charset, CP_SYMBOL maps unicode characters into a different range)
+        77: 10000, // Mac Roman
+        78: 10001, // Mac Shift Jis
+        79: 10003, // Mac Hangul
+        80: 10008, // Mac GB2312
+        81: 10002, // Mac Big5
+        83: 10005, // Mac Hebrew
+        84: 10004, // Mac Arabic
+        85: 10006, // Mac Greek
+        86: 10081, // Mac Turkish
+        87: 10021, // Mac Thai
+        88: 10029, // Mac East Europe
+        89: 10007, // Mac Russian
+        128: 932,   // SHIFTJIS_CHARSET
+        129: 949,   // HANGEUL_CHARSET
+        130: 1361,  // JOHAB_CHARSET
+        134: 936,   // GB2313_CHARSET
+        136: 950,   // CHINESEBIG5_CHARSET
+        161: 1253,  // GREEK_CHARSET
+        162: 1254,  // TURKISH_CHARSET
+        163: 1258,  // VIETNAMESE_CHARSET
+        177: 1255,  // HEBREW_CHARSET
+        178: 1256,  // ARABIC_CHARSET
+        186: 1257,  // BALTIC_CHARSET
+        204: 1251,  // RUSSIAN_CHARSET
+        222: 874,   // THAI_CHARSET
+        238: 1250,  // EE_CHARSET (Eastern European)
+        254: 437,   // PC 437
+        255: 850,   // OEM
     };
 
-    private static _colorThemeMap: {[key: string]: null} = {
+    private static _colorThemeMap: { [key: string]: null } = {
         // TODO
         maindarkone: null,
         mainlightone: null,

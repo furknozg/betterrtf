@@ -34,14 +34,13 @@ import {
 } from "./RenderElements";
 
 export interface IContainerElement {
-    element: JQuery;
-    content: JQuery;
+    element: HTMLElement;
+    content: HTMLElement;
 }
 
 export class Renderer {
     public _doc: Document;
-    private _dom: JQuery[];
-
+    private _dom: HTMLElement[];
     private _chp: Chp;
     private _pap: Pap;
     private _curpar: Array<RenderElement | RenderContainer>;
@@ -56,7 +55,7 @@ export class Renderer {
     public pushContainer(container: RenderContainer) {
         const len = this._curcont.push(container);
         if (len > 1) {
-            const prevcontel = this._curcont[len - 1];
+            const prevcontel = this._curcont[len - 2];
             prevcontel.appendSub(container);
         } else {
             if (this._cursubparIdx >= 0) {
@@ -108,11 +107,13 @@ export class Renderer {
         return cont;
     }
 
-    public buildHyperlinkElement(url: string): JQuery {
-        return $("<a>").attr("href", url);
+    public buildHyperlinkElement(url: string): HTMLElement {
+        const link: HTMLAnchorElement = document.createElement("a");
+        link.href = url;
+        return link;
     }
 
-    public _appendToPar(content: RenderElement, newsubpar?: boolean) {
+    public _appendToPar(content: RenderElement | null, newsubpar?: boolean) {
         if (newsubpar === true) {
             // Move everything in _curpar since the last sub-paragraph into a new one
             let par = new RenderParagraphContainer(this._doc);
@@ -133,6 +134,11 @@ export class Renderer {
                 this._curpar.push(content);
             }
         } else if (content != null) {
+            if (this._cursubparIdx < 0) {
+                const par = new RenderParagraphContainer(this._doc);
+                this._cursubparIdx = this._curpar.push(par) - 1;
+                par.updateProps(this._pap, this._chp);
+            }
             if (this._curcont.length > 0 && this._curcont[this._curcont.length - 1] instanceof RenderTableContainer
                 && this._pap.intable === false) {
                 this._curcont.pop();
@@ -149,61 +155,58 @@ export class Renderer {
         }
     }
 
-    public finishPar() {
-        this._appendToPar(null, true);
-        // if (this._pap != null && this._pap.intable) {
-        //     Helper.log("[rtf] finishPar: finishing table row");
-        //     this.finishRow();
-        // }
-    }
-
-    public lineBreak() {
+    public finishPar(): void {
         this._appendToPar(null, true);
     }
 
-    public finishRow() {
+    public lineBreak(): void {
+        this._appendToPar(null, true);
+    }
+
+    public finishRow(): void {
         const table = this.currentContainer("table") as RenderTableContainer;
         if (table == null) {
-            throw new RTFJSError("No table on rendering stack");
+            return;
         }
         table.finishRow();
     }
 
-    public finishCell() {
+    public finishCell(): void {
         const table = this.currentContainer("table") as RenderTableContainer;
         if (table == null) {
-            throw new RTFJSError("No table on rendering stack");
+            return;
         }
         table.finishCell();
     }
 
-    public setChp(chp: Chp) {
+    public setChp(chp: Chp): void {
         this._chp = chp;
     }
 
-    public setPap(pap: Pap) {
+    public setPap(pap: Pap): void {
         this._pap = pap;
         if (this._cursubparIdx >= 0) {
-            this._curpar[this._cursubparIdx - 1].updateProps(this._pap, this._chp);
+            this._curpar[this._cursubparIdx].updateProps(this._pap, this._chp);
         }
     }
 
-    public appendElement(element: JQuery) {
+    public appendElement(element: JQuery | HTMLElement): void {
         this._appendToPar(new RenderElement(this._doc, "element", element));
     }
 
-    public buildRenderedPicture(element: JQuery) {
+    public buildRenderedPicture(element: JQuery | HTMLElement): RenderElement {
         if (element == null) {
-            element = $("<span>").text("[failed to render image]");
+            element = document.createElement("span");
+            element.textContent = "[failed to render image]";
         }
         return new RenderElement(this._doc, "picture", element);
     }
 
-    public renderedPicture(element: JQuery) {
+    public renderedPicture(element: JQuery | HTMLElement): void {
         this._appendToPar(this.buildRenderedPicture(element));
     }
 
-    public buildPicture(mime: string, data: string) {
+    public buildPicture(mime: string, data: string): RenderElement {
         let element;
         if (data != null) {
             element = $("<img>", {
@@ -219,11 +222,11 @@ export class Renderer {
         return new RenderElement(this._doc, "picture", element);
     }
 
-    public picture(mime: string, data: string) {
+    public picture(mime: string, data: string): void {
         this._appendToPar(this.buildPicture(mime, data));
     }
 
-    public buildDom(): JQuery[] {
+    public buildDom(): HTMLElement[] {
         if (this._dom != null) {
             return this._dom;
         }
@@ -251,7 +254,7 @@ export class Renderer {
             // At this point all render elements have been wrapped in RenderParagraphContainer objects
             const element = this._curpar[i].finalize();
             if (element) {
-                this._dom.push(element);
+                this._dom.push(element.get(0));
             }
         }
 

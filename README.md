@@ -23,11 +23,7 @@ For information on how to use the library see the [Getting Started Guide](GETTIN
 
 # Dependencies
 * rtf.js requires:
-  * [jquery](https://jquery.com/)
   * [js-codepage](https://github.com/SheetJS/js-codepage/) (Apache 2.0 license, included in the rtf.js bundle)
-* wmf.js and emf.js require:
-  * [jquery](https://jquery.com/)
-  * [jquery.svg.js plugin](https://github.com/kbwood/svg) with the jquery.svgfilter.js extension.
 * Rendering WMF and EMF images is accomplished by using HTML5's `<svg>` feature.
 * Rendering RTF documents often requires rendering embedded WMF and EMF images, however rtf.js can be used without wmf.js and emf.js or with just one of them, if rendering such images is not required.
 
@@ -36,6 +32,12 @@ See the [Getting Started Guide](GETTING_STARTED.md) for details.
 # Developing
 To develop first install the dependencies using `npm install`.
 
+## Build with watch mode
+For development purposes you can start a watch, which will build the project, serve the sample pages on `localhost:8080` and automatically recompile and reload the sample page if you make a code change. This can be started with:
+```
+$ npm run watch
+```
+
 ## Building
 To build the entire project and create the bundles run:
 ```
@@ -43,7 +45,7 @@ $ npm run build
 ```
 
 ## Tests
-Please run `npm run lint` first to make sure your code adheres to the style guide.
+Please run `npm run lint` first to make sure your code adheres to the style guide and `npm run build` to build the code to be tested
 
 To run the test suite run:
 ```
@@ -52,12 +54,12 @@ $ npm run test
 
 To create a new test (type is `rtf`, `emf` or `wmf`):
 ```
-$ npm run generate-testcase type test-name /path/to/test.rtf
+$ npm run generate-testcase <type> <test-name> </path/to/test.rtf>
 ```
 
 To regenerate the expected result for an existing test:
 ```
-$ npm run regenerate-testcase type test-name
+$ npm run regenerate-testcase <type> <test-name>
 ```
 
 ## Code Coverage
@@ -73,3 +75,6 @@ $ npm run coverage-html
 
 **Warning:** creating coverage reports instruments the bundles in the `dist` directory.
 Don't forget to build the project again before committing.
+
+# Releasing
+See the [Release Instructions](RELEASING.md) for details.

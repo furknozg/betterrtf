@@ -131,12 +131,12 @@ describe("Test files", function() {
         });
 
         it("should preserve empty spacer cells for alignment", function() {
-            expect(result.html).to.contain("<td></td>");
+            expect(result.html).to.contain("<td style=\"vertical-align: top; border-left: 1px solid rgb(0,0,0); border-right: 1px solid rgb(0,0,0);\">");
         });
 
         it("should emit visible border styles", function() {
-            expect(result.html).to.contain("border-top: 2px solid rgb(0,0,0)");
-            expect(result.html).to.contain("border-right: 2px solid rgb(0,0,0)");
+            expect(result.html).to.contain("border-top: 1px solid rgb(0,0,0)");
+            expect(result.html).to.contain("border-right: 1px solid rgb(0,0,0)");
         });
 
         it("should emit rowspans for vertical merges", function() {

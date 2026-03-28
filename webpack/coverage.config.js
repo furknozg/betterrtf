@@ -1,20 +1,22 @@
 const path = require('path');
-const merge = require('webpack-merge');
+const webpackMerge = require('webpack-merge');
+const merge = webpackMerge.merge || webpackMerge;
 const baseConfig = require('./base.config.js');
 
 module.exports = merge(baseConfig, {
+    mode: 'development',
     module: {
         rules: [
             {
                 test: /\.ts?$/,
                 use: [
                     {
-                        loader: 'istanbul-instrumenter-loader',
+                        loader: "@jsdevtools/coverage-istanbul-loader",
                         options: {
                             esModules: true
                         }
                     },
-                    'ts-loader'
+                    "ts-loader"
                 ],
                 include: [
                     path.resolve(__dirname, "../src"),

@@ -33,7 +33,7 @@ import { Region } from "./Region";
 import { Brush, ColorRef, Font, Palette, Pen } from "./Style";
 
 export class WMFRecords {
-    private _records: Array<(gdi: GDIContext) => void>;
+    private _records: ((gdi: GDIContext) => void)[];
 
     constructor(reader: Blob, first: number) {
         this._records = [];
@@ -124,6 +124,28 @@ export class WMFRecords {
                     this._records.push((gdi) => {
                         gdi.setStretchBltMode(stretchMode);
                     });
+                    break;
+                }
+                case Helper.GDI.RecordType.META_DIBBITBLT: {
+                    const haveSrcDib = ((type >> 8) + 3 !== size);
+                    const rasterOp = reader.readUint16() | (reader.readUint16() << 16);
+                    const srcY = reader.readInt16();
+                    const srcX = reader.readInt16();
+                    if (!haveSrcDib) {
+                        // ignore reserved field
+                        reader.skip(2);
+                    }
+                    const height = reader.readInt16();
+                    const width = reader.readInt16();
+                    const destY = reader.readInt16();
+                    const destX = reader.readInt16();
+                    if (haveSrcDib) {
+                        const datalength = size * 2 - (reader.pos - curpos);
+                        const dib = new DIBitmap(reader, datalength);
+                        this._records.push((gdi) => {
+                            gdi.dibBits(srcX, srcY, destX, destY, width, height, rasterOp, dib);
+                        });
+                    }
                     break;
                 }
                 case Helper.GDI.RecordType.META_DIBSTRETCHBLT: {
@@ -478,7 +500,6 @@ export class WMFRecords {
                 case Helper.GDI.RecordType.META_CHORD:
                 case Helper.GDI.RecordType.META_BITBLT:
                 case Helper.GDI.RecordType.META_SETDIBTODEV:
-                case Helper.GDI.RecordType.META_DIBBITBLT:
                 default: {
                     let recordName = "UNKNOWN";
                     for (const name in Helper.GDI.RecordType) {
@@ -502,7 +523,7 @@ export class WMFRecords {
         }
     }
 
-    public play(gdi: GDIContext) {
+    public play(gdi: GDIContext): void {
         const len = this._records.length;
         for (let i = 0; i < len; i++) {
             this._records[i](gdi);

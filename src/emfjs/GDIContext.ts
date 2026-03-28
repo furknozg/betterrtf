@@ -25,24 +25,27 @@ SOFTWARE.
 
 */
 
+import { SVG } from "../util";
+import { SVGPathBuilder } from "../util/SVG";
 import { EMFJSError, Helper } from "./Helper";
 import { Obj, PointL, PointS, RectL } from "./Primitives";
 import { CreateSimpleRegion, Region } from "./Region";
 import { Brush, ColorRef, Font, Pen } from "./Style";
 
-export interface ISelectedStyle {
+interface ISelectedStyle {
     brush?: Brush;
     pen?: Pen;
     font?: Font;
     region?: Region;
     path?: Path;
-    [key: string]: Obj;
+
+    [key: string]: Obj | undefined;
 }
 
-export class Path extends Obj {
-    public svgPath: any;
+class Path extends Obj {
+    public svgPath: SVGPathBuilder;
 
-    constructor(svgPath: any, copy?: Path) {
+    constructor(svgPath: SVGPathBuilder, copy?: Path) {
         super("path");
         if (svgPath != null) {
             this.svgPath = svgPath;
@@ -51,16 +54,16 @@ export class Path extends Obj {
         }
     }
 
-    public clone() {
-        return new Path(null, this.svgPath);
+    public clone(): Path {
+        return new Path(null, this);
     }
 
-    public toString() {
+    public toString(): string {
         return "{[path]}";
     }
 }
 
-function createStockObjects(): {[key: string]: Obj} {
+function createStockObjects(): { [key: string]: Obj } {
     // Create global stock objects
     const createSolidBrush = (r: number, g: number, b: number) => {
         return new Brush(null, {
@@ -71,7 +74,7 @@ function createStockObjects(): {[key: string]: Obj} {
     const createSolidPen = (r: number, g: number, b: number) => {
         return new Pen(null, Helper.GDI.PenStyle.PS_SOLID, 1, new ColorRef(null, r, g, b), null);
     };
-    const stockObjs: {[key: string]: Obj} = {
+    const stockObjs: { [key: string]: Obj } = {
         WHITE_BRUSH: createSolidBrush(255, 255, 255),
         LTGRAY_BRUSH: createSolidBrush(212, 208, 200),
         GRAY_BRUSH: createSolidBrush(128, 128, 128),
@@ -93,21 +96,21 @@ function createStockObjects(): {[key: string]: Obj} {
         DEFAULT_GUI_FONT: null, // TODO
     };
 
-    const objs: {[key: string]: Obj} = {};
+    const objs: { [key: string]: Obj } = {};
     for (const t in stockObjs) {
-        const stockObjects: {[key: string]: number} = Helper.GDI.StockObject as {[key: string]: number};
+        const stockObjects: { [key: string]: number } = Helper.GDI.StockObject as { [key: string]: number };
         const idx = stockObjects[t] - 0x80000000;
         objs[idx.toString()] = stockObjs[t];
     }
     return objs;
 }
 
-export const _StockObjects = createStockObjects();
+const _StockObjects = createStockObjects();
 
-export class GDIContextState {
-    public _svggroup: any;
+class GDIContextState {
+    public _svggroup: SVGElement;
     public _svgclipChanged: boolean;
-    public _svgtextbkfilter: any;
+    public _svgtextbkfilter: SVGFilterElement;
     public mapmode: number;
     public stretchmode: number;
     public textalign: number;
@@ -209,17 +212,17 @@ export class GDIContextState {
 }
 
 export class GDIContext {
-    private _svg: any;
-    private _svgdefs: any;
-    private _svgPatterns: {[key: string]: Brush};
-    private _svgClipPaths: {[key: string]: Region};
-    private _svgPath: any;
+    private _svg: SVG;
+    private _svgdefs: SVGDefsElement;
+    private _svgPatterns: { [key: string]: Brush };
+    private _svgClipPaths: { [key: string]: Region };
+    private _svgPath: SVGPathBuilder;
     private defObjects: ISelectedStyle;
     private state: GDIContextState;
     private statestack: GDIContextState[];
-    private objects: {[key: string]: Obj};
+    private objects: { [key: string]: Obj };
 
-    constructor(svg: any) {
+    constructor(svg: SVG) {
         this._svg = svg;
         this._svgdefs = null;
         this._svgPatterns = {};
@@ -242,47 +245,47 @@ export class GDIContext {
         this.objects = {};
     }
 
-    public setMapMode(mode: number) {
+    public setMapMode(mode: number): void {
         Helper.log("[gdi] setMapMode: mode=" + mode);
         this.state.mapmode = mode;
         this.state._svggroup = null;
     }
 
-    public setWindowOrgEx(x: number, y: number) {
+    public setWindowOrgEx(x: number, y: number): void {
         Helper.log("[gdi] setWindowOrgEx: x=" + x + " y=" + y);
         this.state.wx = x;
         this.state.wy = y;
         this.state._svggroup = null;
     }
 
-    public setWindowExtEx(x: number, y: number) {
+    public setWindowExtEx(x: number, y: number): void {
         Helper.log("[gdi] setWindowExtEx: x=" + x + " y=" + y);
         this.state.ww = x;
         this.state.wh = y;
         this.state._svggroup = null;
     }
 
-    public setViewportOrgEx(x: number, y: number) {
+    public setViewportOrgEx(x: number, y: number): void {
         Helper.log("[gdi] setViewportOrgEx: x=" + x + " y=" + y);
         this.state.vx = x;
         this.state.vy = y;
         this.state._svggroup = null;
     }
 
-    public setViewportExtEx(x: number, y: number) {
+    public setViewportExtEx(x: number, y: number): void {
         Helper.log("[gdi] setViewportExtEx: x=" + x + " y=" + y);
         this.state.vw = x;
         this.state.vh = y;
         this.state._svggroup = null;
     }
 
-    public setBrushOrgEx(origin: PointL) {
+    public setBrushOrgEx(origin: PointL): void {
         Helper.log("[gdi] setBrushOrgEx: x=" + origin.x + " y=" + origin.y);
         this.state.nextbrx = origin.x;
         this.state.nextbry = origin.y;
     }
 
-    public saveDC() {
+    public saveDC(): void {
         Helper.log("[gdi] saveDC");
         const prevstate = this.state;
         this.state = new GDIContextState(this.state);
@@ -290,7 +293,7 @@ export class GDIContext {
         this.state._svggroup = null;
     }
 
-    public restoreDC(saved: number) {
+    public restoreDC(saved: number): void {
         Helper.log("[gdi] restoreDC: saved=" + saved);
         if (this.statestack.length > 1) {
             if (saved === -1) {
@@ -307,11 +310,11 @@ export class GDIContext {
         this.state._svggroup = null;
     }
 
-    public setStretchBltMode(stretchMode: number) {
+    public setStretchBltMode(stretchMode: number): void {
         Helper.log("[gdi] setStretchBltMode: stretchMode=" + stretchMode);
     }
 
-    public rectangle(rect: RectL, rw: number, rh: number) {
+    public rectangle(rect: RectL, rw: number, rh: number): void {
         Helper.log("[gdi] rectangle: rect=" + rect.toString() + " with pen " + this.state.selected.pen.toString()
             + " and brush " + this.state.selected.brush.toString());
         const bottom = this._todevY(rect.bottom);
@@ -328,7 +331,7 @@ export class GDIContext {
         this._svg.rect(this.state._svggroup, left, top, right - left, bottom - top, rw / 2, rh / 2, opts);
     }
 
-    public lineTo(x: number, y: number) {
+    public lineTo(x: number, y: number): void {
         Helper.log("[gdi] lineTo: x=" + x + " y=" + y + " with pen " + this.state.selected.pen.toString());
         const toX = this._todevX(x);
         const toY = this._todevY(y);
@@ -346,7 +349,7 @@ export class GDIContext {
         this._svg.line(this.state._svggroup, fromX, fromY, toX, toY, opts);
     }
 
-    public moveToEx(x: number, y: number) {
+    public moveToEx(x: number, y: number): void {
         Helper.log("[gdi] moveToEx: x=" + x + " y=" + y);
         this.state.x = x;
         this.state.y = y;
@@ -356,7 +359,7 @@ export class GDIContext {
         }
     }
 
-    public polygon(points: PointS[] | PointL[], bounds: RectL, first: boolean) {
+    public polygon(points: PointS[] | PointL[], bounds: RectL, first: boolean): void {
         Helper.log("[gdi] polygon: points=" + points + " with pen " + this.state.selected.pen.toString()
             + " and brush " + this.state.selected.brush.toString());
         const pts = [];
@@ -374,7 +377,7 @@ export class GDIContext {
         this._svg.polygon(this.state._svggroup, pts, opts);
     }
 
-    public polyPolygon(polygons: PointS[][] | PointL[][], bounds: RectL) {
+    public polyPolygon(polygons: PointS[][] | PointL[][], bounds: RectL): void {
         Helper.log("[gdi] polyPolygon: polygons.length=" + polygons.length
             + " with pen " + this.state.selected.pen.toString() + " and brush " + this.state.selected.brush.toString());
 
@@ -384,10 +387,10 @@ export class GDIContext {
         }
     }
 
-    public polyline(isLineTo: boolean, points: PointS[], bounds: RectL) {
+    public polyline(isLineTo: boolean, points: PointS[], bounds: RectL): void {
         Helper.log("[gdi] polyline: isLineTo=" + isLineTo.toString() + ", points=" + points
             + ", bounds=" + bounds.toString() + " with pen " + this.state.selected.pen.toString());
-        const pts = [];
+        const pts: number[][] = [];
         for (let i = 0; i < points.length; i++) {
             const point = points[i];
             pts.push([this._todevX(point.x), this._todevY(point.y)]);
@@ -421,13 +424,13 @@ export class GDIContext {
         }
     }
 
-    public polybezier(isPolyBezierTo: boolean, points: PointS[], bounds: RectL) {
+    public polybezier(isPolyBezierTo: boolean, points: PointS[], bounds: RectL): void {
         Helper.log("[gdi] polybezier: isPolyBezierTo=" + isPolyBezierTo.toString() + ", points=" + points
             + ", bounds=" + bounds.toString() + " with pen " + this.state.selected.pen.toString());
         const pts = [];
         for (let i = 0; i < points.length; i++) {
             const point = points[i];
-            pts.push({ x: this._todevX(point.x), y: this._todevY(point.y)});
+            pts.push({x: this._todevX(point.x), y: this._todevY(point.y)});
         }
 
         if (this._svgPath != null) {
@@ -461,11 +464,11 @@ export class GDIContext {
         }
     }
 
-    public selectClipPath(rgnMode: number) {
+    public selectClipPath(rgnMode: number): void {
         Helper.log("[gdi] selectClipPath: rgnMode=0x" + rgnMode.toString(16));
     }
 
-    public selectClipRgn(rgnMode: number, region: Region) {
+    public selectClipRgn(rgnMode: number, region: Region): void {
         Helper.log("[gdi] selectClipRgn: rgnMode=0x" + rgnMode.toString(16));
         if (rgnMode === Helper.GDI.RegionMode.RGN_COPY) {
             this.state.selected.region = region;
@@ -481,53 +484,53 @@ export class GDIContext {
         this.state._svgclipChanged = true;
     }
 
-    public offsetClipRgn(offset: PointL) {
+    public offsetClipRgn(offset: PointL): void {
         Helper.log("[gdi] offsetClipRgn: offset=" + offset.toString());
         this._getClipRgn().offset(offset.x, offset.y);
     }
 
-    public setTextAlign(textAlignmentMode: number) {
+    public setTextAlign(textAlignmentMode: number): void {
         Helper.log("[gdi] setTextAlign: textAlignmentMode=0x" + textAlignmentMode.toString(16));
         this.state.textalign = textAlignmentMode;
     }
 
-    public setMiterLimit(miterLimit: number) {
+    public setMiterLimit(miterLimit: number): void {
         Helper.log("[gdi] setMiterLimit: miterLimit=" + miterLimit);
         this.state.miterlimit = miterLimit;
     }
 
-    public setBkMode(bkMode: number) {
+    public setBkMode(bkMode: number): void {
         Helper.log("[gdi] setBkMode: bkMode=0x" + bkMode.toString(16));
         this.state.bkmode = bkMode;
     }
 
-    public setBkColor(bkColor: ColorRef) {
+    public setBkColor(bkColor: ColorRef): void {
         Helper.log("[gdi] setBkColor: bkColor=" + bkColor.toString());
         this.state.bkcolor = bkColor;
         this.state._svgtextbkfilter = null;
     }
 
-    public setPolyFillMode(polyFillMode: number) {
+    public setPolyFillMode(polyFillMode: number): void {
         Helper.log("[gdi] setPolyFillMode: polyFillMode=" + polyFillMode);
         this.state.polyfillmode = polyFillMode;
     }
 
-    public createBrush(index: number, brush: Brush) {
+    public createBrush(index: number, brush: Brush): void {
         const idx = this._storeObject(brush, index);
         Helper.log("[gdi] createBrush: brush=" + brush.toString() + " with handle " + idx);
     }
 
-    public createPen(index: number, pen: Pen) {
+    public createPen(index: number, pen: Pen): void {
         const idx = this._storeObject(pen, index);
         Helper.log("[gdi] createPen: pen=" + pen.toString() + " width handle " + idx);
     }
 
-    public createPenEx(index: number, pen: Pen) {
+    public createPenEx(index: number, pen: Pen): void {
         const idx = this._storeObject(pen, index);
         Helper.log("[gdi] createPenEx: pen=" + pen.toString() + " width handle " + idx);
     }
 
-    public selectObject(objIdx: number, checkType: string) {
+    public selectObject(objIdx: number, checkType: string): void {
         const obj = this._getObject(objIdx);
         if (obj != null && (checkType == null || obj.type === checkType)) {
             this._selectObject(obj);
@@ -539,14 +542,14 @@ export class GDIContext {
         }
     }
 
-    public abortPath() {
+    public abortPath(): void {
         Helper.log("[gdi] abortPath");
         if (this._svgPath != null) {
             this._svgPath = null;
         }
     }
 
-    public beginPath() {
+    public beginPath(): void {
         Helper.log("[gdi] beginPath");
 
         if (this._svgPath != null) {
@@ -556,7 +559,7 @@ export class GDIContext {
         this._svgPath = this._svg.createPath();
     }
 
-    public closeFigure() {
+    public closeFigure(): void {
         Helper.log("[gdi] closeFigure");
         if (this._svgPath == null) {
             throw new EMFJSError("No path bracket: cannot close figure");
@@ -565,7 +568,7 @@ export class GDIContext {
         this._svgPath.close();
     }
 
-    public fillPath(bounds: RectL) {
+    public fillPath(bounds: RectL): void {
         Helper.log("[gdi] fillPath");
         if (this.state.selected.path == null) {
             throw new EMFJSError("No path selected");
@@ -579,7 +582,7 @@ export class GDIContext {
         this.state.selected.path = null;
     }
 
-    public strokePath(bounds: RectL) {
+    public strokePath(bounds: RectL): void {
         Helper.log("[gdi] strokePath");
         if (this.state.selected.path == null) {
             throw new EMFJSError("No path selected");
@@ -593,7 +596,7 @@ export class GDIContext {
         this.state.selected.path = null;
     }
 
-    public endPath() {
+    public endPath(): void {
         Helper.log("[gdi] endPath");
         if (this._svgPath == null) {
             throw new EMFJSError("No path bracket: cannot end path");
@@ -604,12 +607,12 @@ export class GDIContext {
         this._svgPath = null;
     }
 
-    public deleteObject(objIdx: number) {
+    public deleteObject(objIdx: number): void {
         const ret = this._deleteObject(objIdx);
         Helper.log("[gdi] deleteObject: objIdx=" + objIdx + (ret ? " deleted object" : "[invalid index]"));
     }
 
-    private _pushGroup() {
+    private _pushGroup(): void {
         if (this.state._svggroup == null || this.state._svgclipChanged) {
             this.state._svgclipChanged = false;
             this.state._svgtextbkfilter = null;
@@ -693,7 +696,7 @@ export class GDIContext {
                     this._todevY(region.bounds.top),
                     this._todevW(region.bounds.right - region.bounds.left),
                     this._todevH(region.bounds.bottom - region.bounds.top),
-                    { fill: "black", strokeWidth: 0 });
+                    {"fill": "black", "stroke-width": 0});
                 break;
             case 2:
                 for (let i = 0; i < region.scans.length; i++) {
@@ -702,7 +705,7 @@ export class GDIContext {
                         const scanline = scan.scanlines[j];
                         this._svg.rect(sclip, this._todevX(scanline.left), this._todevY(scan.top),
                             this._todevW(scanline.right - scanline.left), this._todevH(scan.bottom - scan.top),
-                            { fill: "black", strokeWidth: 0 });
+                            {"fill": "black", "stroke-width": 0});
                     }
                 }
                 break;
@@ -846,19 +849,18 @@ export class GDIContext {
         if (usePen) {
             const pen = this.state.selected.pen;
             if (pen.style !== Helper.GDI.PenStyle.PS_NULL) {
-                opts.stroke =  "#" + pen.color.toHex(); // TODO: pen style
-                opts.strokeWidth = pen.width;
+                opts.stroke = "#" + pen.color.toHex(); // TODO: pen style
+                opts["stroke-width"] = pen.width;
 
                 opts["stroke-miterlimit"] = this.state.miterlimit;
 
-                let dotWidth;
                 opts["stroke-linecap"] = "round";
-                dotWidth = 1;
+                const dotWidth = 1;
 
                 opts["stroke-linejoin"] = "round";
 
-                const dashWidth = opts.strokeWidth * 4;
-                const dotSpacing = opts.strokeWidth * 2;
+                const dashWidth = opts["stroke-width"] * 4;
+                const dotSpacing = opts["stroke-width"] * 2;
                 switch (pen.style) {
                     case Helper.GDI.PenStyle.PS_DASH:
                         opts["stroke-dasharray"] = [dashWidth, dotSpacing].toString();

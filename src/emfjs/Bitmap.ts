@@ -26,18 +26,15 @@ SOFTWARE.
 */
 
 import { Blob } from "./Blob";
-import { EMFJSError, Helper } from "./Helper";
+import { Helper } from "./Helper";
 
-export class BitmapBase {
-    public getWidth() {
-        throw new EMFJSError("getWidth not implemented");
-    }
+interface Bitmap {
+    getWidth(): number
 
-    public getHeight() {
-        throw new EMFJSError("getHeight not implemented");
-    }
+    getHeight(): number
 }
-export class BitmapCoreHeader {
+
+class BitmapCoreHeader {
     public width: number;
     public height: number;
     public planes: number;
@@ -53,12 +50,12 @@ export class BitmapCoreHeader {
         this.bitcount = reader.readUint16();
     }
 
-    public colors() {
+    public colors(): number {
         return this.bitcount <= 8 ? 1 << this.bitcount : 0;
     }
 }
 
-export class BitmapInfoHeader {
+class BitmapInfoHeader {
     public width: number;
     public height: number;
     public planes: number;
@@ -86,7 +83,7 @@ export class BitmapInfoHeader {
         this.clrimportant = reader.readUint32();
     }
 
-    public colors() {
+    public colors(): number {
         if (this.clrused !== 0) {
             return this.clrused < 256 ? this.clrused : 256;
         } else {
@@ -95,13 +92,12 @@ export class BitmapInfoHeader {
     }
 }
 
-export class BitmapInfo extends BitmapBase {
+export class BitmapInfo implements Bitmap {
     private _usergb: boolean;
     private _infosize: number;
     private _header: BitmapCoreHeader | BitmapInfoHeader;
 
     constructor(reader: Blob, usergb: boolean) {
-        super();
         this._usergb = usergb;
         const hdrsize = reader.readUint32();
         this._infosize = hdrsize;
@@ -111,7 +107,7 @@ export class BitmapInfo extends BitmapBase {
         } else {
             this._header = new BitmapInfoHeader(reader, false);
             const masks = (this._header as BitmapInfoHeader).compression
-                === Helper.GDI.BitmapCompression.BI_BITFIELDS ? 3 : 0;
+            === Helper.GDI.BitmapCompression.BI_BITFIELDS ? 3 : 0;
             if (hdrsize <= Helper.GDI.BITMAPINFOHEADER_SIZE + (masks * 4)) {
                 this._infosize = Helper.GDI.BITMAPINFOHEADER_SIZE + (masks * 4);
             }
@@ -119,50 +115,49 @@ export class BitmapInfo extends BitmapBase {
         }
     }
 
-    public getWidth() {
+    public getWidth(): number {
         return this._header.width;
     }
 
-    public getHeight() {
+    public getHeight(): number {
         return Math.abs(this._header.height);
     }
 
-    public infosize() {
+    public infosize(): number {
         return this._infosize;
     }
 
-    public header() {
+    public header(): BitmapCoreHeader | BitmapInfoHeader {
         return this._header;
     }
 }
 
-export class DIBitmap extends BitmapBase {
+export class DIBitmap implements Bitmap {
     private _reader: Blob;
     private _offset: number;
     private _location: any;
     private _info: BitmapInfo;
 
     constructor(reader: Blob, bitmapInfo?: any) {
-        super();
         this._reader = reader;
         this._offset = reader.pos;
         this._location = bitmapInfo;
         this._info = new BitmapInfo(reader, true);
     }
 
-    public getWidth() {
+    public getWidth(): number {
         return this._info.getWidth();
     }
 
-    public getHeight() {
+    public getHeight(): number {
         return this._info.getHeight();
     }
 
-    public totalSize() {
+    public totalSize(): number {
         return this._location.header.size + this._location.data.size;
     }
 
-    public makeBitmapFileHeader() {
+    public makeBitmapFileHeader(): string {
         const buf = new ArrayBuffer(14);
         const view = new Uint8Array(buf);
         view[0] = 0x42;
@@ -172,7 +167,7 @@ export class DIBitmap extends BitmapBase {
         return Helper._blobToBinary(view);
     }
 
-    public base64ref() {
+    public base64ref(): string {
         const prevpos = this._reader.pos;
         this._reader.seek(this._offset);
         let mime = "image/bmp";

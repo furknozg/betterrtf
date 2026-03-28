@@ -58,8 +58,10 @@ export class Chp {
     public strikethrough: boolean;
     public dblstrikethrough: boolean;
     public colorindex: number;
+    public highlightindex: number;
     public fontsize: number;
     public fontfamily: number;
+    public supersubscript: number;
 
     constructor(parent: Chp) {
         if (parent != null) {
@@ -69,8 +71,10 @@ export class Chp {
             this.strikethrough = parent.strikethrough;
             this.dblstrikethrough = parent.dblstrikethrough;
             this.colorindex = parent.colorindex;
+            this.highlightindex = parent.highlightindex;
             this.fontsize = parent.fontsize;
             this.fontfamily = parent.fontfamily;
+            this.supersubscript = parent.supersubscript;
         } else {
             this.bold = false;
             this.underline = Helper.UNDERLINE.NONE;
@@ -78,7 +82,9 @@ export class Chp {
             this.strikethrough = false;
             this.dblstrikethrough = false;
             this.colorindex = 0;
+            this.highlightindex = 0;
             this.fontsize = 24;
+            this.supersubscript = Helper.SUPERSUBSCRIPT.NONE;
         }
     }
 }
@@ -222,11 +228,11 @@ export class Tbl {
 }
 
 export class Pap {
-    public indent: {left: number, right: number, firstline: number};
+    public indent: { left: number, right: number, firstline: number };
     public justification: string;
     public spacebefore: number;
     public spaceafter: number;
-    public charactertype: string;
+    public charactertype: string | null;
     public intable: boolean;
     public isrow: boolean;
 
@@ -254,6 +260,7 @@ export class Pap {
             this.spaceafter = 0;
             this.intable = false;
             this.isrow = false;
+            this.charactertype = null;
         }
     }
 }
@@ -261,7 +268,7 @@ export class Pap {
 export class Sep {
     public columns: number;
     public breaktype: string;
-    public pagenumber: {x: number, y: number};
+    public pagenumber: { x: number, y: number };
     public pagenumberformat: string;
 
     constructor(parent: Sep) {
@@ -288,7 +295,7 @@ export class Sep {
 export class Dop {
     public width: number;
     public height: number;
-    public margin: {left: number, top: number, right: number, bottom: number};
+    public margin: { left: number, top: number, right: number, bottom: number };
     public pagenumberstart: number;
     public facingpages: boolean;
     public landscape: boolean;
@@ -336,6 +343,7 @@ export class State {
     public skipunknowndestination: boolean;
     public skipdestination: boolean;
     public ucn: number;
+
     [key: string]: any;
 
     constructor(parent: State) {
@@ -374,9 +382,9 @@ export class GlobalState {
     public column: number;
     public state: State;
     public version: number;
-    public text: string;
+    public text: (PlainText | HexText)[];
     public codepage: number;
-    public _asyncTasks: Array<Promise<any>>;
+    public _asyncTasks: Promise<any>[];
     public renderer: Renderer;
 
     constructor(blob: ArrayBuffer, renderer: Renderer) {
@@ -386,9 +394,19 @@ export class GlobalState {
         this.column = 0;
         this.state = null;
         this.version = null;
-        this.text = "";
-        this. codepage = 1252;
+        this.text = [];
+        this.codepage = 1252;
         this._asyncTasks = [];
         this.renderer = renderer;
+    }
+}
+
+export class PlainText {
+    constructor(public text: string) {
+    }
+}
+
+export class HexText {
+    constructor(public hex: number, public chp: Chp) {
     }
 }

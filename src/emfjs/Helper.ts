@@ -25,23 +25,16 @@ SOFTWARE.
 
 */
 
-// tslint:disable-next-line:interface-name
-export interface EMFJSError {
-    name: string;
-    message: string;
-    stack: string;
+export class EMFJSError extends Error {
+    constructor(message: string) {
+        super(message); // 'Error' breaks prototype chain here
+        Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+    }
 }
 
-// tslint:disable-next-line:variable-name
-export const EMFJSError = function(this: EMFJSError, message: string) {
-    this.name = "EMFJSError";
-    this.message = message;
-    this.stack = (new Error()).stack;
-} as any as { new (message: string): EMFJSError; };
-EMFJSError.prototype = new Error();
-
 let isLoggingEnabled = true;
-export function loggingEnabled(enabled: boolean) {
+
+export function loggingEnabled(enabled: boolean): void {
     isLoggingEnabled = enabled;
 }
 
@@ -330,25 +323,24 @@ export class Helper {
 
     public static _uniqueId = 0;
 
-    public static log(message: string) {
+    public static log(message: string): void {
         if (isLoggingEnabled) {
-            // tslint:disable-next-line:no-console
             console.log(message);
         }
     }
 
-    public static _makeUniqueId(prefix: string) {
+    public static _makeUniqueId(prefix: string): string {
         return "EMFJS_" + prefix + (this._uniqueId++);
     }
 
-    public static _writeUint32Val(uint8arr: Uint8Array, pos: number, val: number) {
+    public static _writeUint32Val(uint8arr: Uint8Array, pos: number, val: number): void {
         uint8arr[pos++] = val & 0xff;
         uint8arr[pos++] = (val >>> 8) & 0xff;
         uint8arr[pos++] = (val >>> 16) & 0xff;
         uint8arr[pos++] = (val >>> 24) & 0xff;
     }
 
-    public static _blobToBinary(blob: Uint8Array) {
+    public static _blobToBinary(blob: Uint8Array): string {
         let ret = "";
         const len = blob.length;
         for (let i = 0; i < len; i++) {

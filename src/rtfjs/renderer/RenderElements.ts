@@ -24,6 +24,7 @@ SOFTWARE.
 
 */
 
+import * as $ from "jquery";
 import { Document } from "../Document";
 import { Helper, RTFJSError } from "../Helper";
 import {
@@ -36,6 +37,16 @@ import {
     Tbl,
 } from "../parser/Containers";
 
+function normalizeElement(element: JQuery | HTMLElement): JQuery {
+    if (element == null) {
+        return null;
+    }
+    if ((element as JQuery).jquery != null) {
+        return element as JQuery;
+    }
+    return $(element as HTMLElement);
+}
+
 export class RenderElement {
     public _doc: Document;
     public _type: string;
@@ -43,10 +54,10 @@ export class RenderElement {
     public _pap: Pap;
     public _chp: Chp;
 
-    constructor(doc: Document, type: string, element: JQuery) {
+    constructor(doc: Document, type: string, element: JQuery | HTMLElement) {
         this._doc = doc;
         this._type = type;
-        this._element = element;
+        this._element = normalizeElement(element);
         this._pap = null;
         this._chp = null;
     }
@@ -73,7 +84,7 @@ export class RenderElement {
 export class RenderTextElement extends RenderElement {
     constructor(doc: Document, text: string, chp: Chp) {
         super(doc, "text", $("<span>").text(text));
-        this._chp = chp;
+        this._chp = chp != null ? chp : new Chp(null);
     }
 
     public applyProps() {
@@ -111,7 +122,20 @@ export class RenderTextElement extends RenderElement {
                 el.css("color", Helper._colorToStr(color));
             }
         }
+        if (chp.highlightindex !== 0) {
+            const color = this._doc._lookupColor(chp.highlightindex);
+            if (color != null) {
+                el.css("background-color", Helper._colorToStr(color));
+            }
+        }
         el.css("font-size", Math.floor(chp.fontsize / 2) + "pt");
+        if (chp.supersubscript === Helper.SUPERSUBSCRIPT.SUPERSCRIPT) {
+            el.css("vertical-align", "super");
+            el.css("font-size", Math.max(1, Math.floor(chp.fontsize / 2) - 2) + "pt");
+        } else if (chp.supersubscript === Helper.SUPERSUBSCRIPT.SUBSCRIPT) {
+            el.css("vertical-align", "sub");
+            el.css("font-size", Math.max(1, Math.floor(chp.fontsize / 2) - 2) + "pt");
+        }
     }
 
     public finalize() {
@@ -131,9 +155,9 @@ export class RenderContainer extends RenderElement {
     public _content: JQuery;
     public _sub: ISub[];
 
-    constructor(doc: Document, type: string, element: JQuery, content: JQuery) {
+    constructor(doc: Document, type: string, element: JQuery | HTMLElement, content: JQuery | HTMLElement) {
         super(doc, type, element);
-        this._content = content;
+        this._content = normalizeElement(content);
         this._sub = [];
     }
 
@@ -202,6 +226,7 @@ export class RenderParagraphContainer extends RenderContainer {
     }
 
     public applyPap(el: JQuery, pap: Pap, chp: Chp) {
+        pap = pap != null ? pap : new Pap(null);
         Helper.log("[rtf] RenderParagraphContainer applyPap: chp=" + JSON.stringify(chp)
             + " pap=" + JSON.stringify(pap));
         el = this.getElement();

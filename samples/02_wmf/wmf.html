@@ -6,10 +6,7 @@
     <script src="../.common/dep/jquery.min.js"></script>
     <script src="../.common/dep/jquery.binarytransport.js"></script>
 
-    <script src="../../dist/jquery.svg.min.js"></script>
-    <script src="../../dist/jquery.svgfilter.min.js"></script>
-
-    <script src="../../dist/WMFJS.bundle.min.js"></script>
+    <script src="../../dist/WMFJS.bundle.js"></script>
 
     <script>
 function closeDoc(reset) {
@@ -50,16 +47,19 @@ function displayWMF(blob) {
             mapMode: 8 // preserve aspect ratio checkbox
         };
         var renderer = new WMFJS.Renderer(blob);
-        var svg = setPictBorder(renderer.render(settings), $("#showpicborder").prop("checked"));
+        var svg = setPictBorder($(renderer.render(settings)), $("#showpicborder").prop("checked"));
         $("#content").empty().append(svg.attr("class", "wmfpict"));
         $("#closebutton").show();
         $("#tools").show();
         console.log("All done!");
     } catch(e) {
-        if (e instanceof WMFJS.Error)
+        if (e instanceof WMFJS.Error) {
             $("#content").text("Error: " + e.message);
-        else
             throw e;
+        }
+        else {
+            throw e;
+        }
     }
 }
 function loadWmfFile(file) {

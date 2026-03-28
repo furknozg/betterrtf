@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("./jquery.svg"), require("./jquery.svgfilter"), require("jquery"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["./jquery.svg", "./jquery.svgfilter", "jquery"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["WMFJS"] = factory(require("./jquery.svg"), require("./jquery.svgfilter"), require("jquery"));
+		exports["WMFJS"] = factory();
 	else
-		root["WMFJS"] = factory(root["$"], root["$"], root["$"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE__1__, __WEBPACK_EXTERNAL_MODULE__2__, __WEBPACK_EXTERNAL_MODULE__4__) {
+		root["WMFJS"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,82 +91,28 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 35);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/wmfjs/index.ts");
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */,
-/* 1 */
-/***/ (function(module, exports) {
+/******/ ({
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__1__;
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
-
-/***/ }),
-/* 3 */,
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__4__;
-
-/***/ }),
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */
+/***/ "./src/util/SVG.ts":
+/*!*************************!*\
+  !*** ./src/util/SVG.ts ***!
+  \*************************/
+/*! exports provided: SVGFilters, SVGPathBuilder, SVG */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var jquery_svg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var jquery_svg__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery_svg__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var jquery_svgfilter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var jquery_svgfilter__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery_svgfilter__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _Renderer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(36);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Renderer", function() { return _Renderer__WEBPACK_IMPORTED_MODULE_2__["Renderer"]; });
-
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(38);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Error", function() { return _Helper__WEBPACK_IMPORTED_MODULE_3__["WMFJSError"]; });
-
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "loggingEnabled", function() { return _Helper__WEBPACK_IMPORTED_MODULE_3__["loggingEnabled"]; });
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SVGFilters", function() { return SVGFilters; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SVGPathBuilder", function() { return SVGPathBuilder; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SVG", function() { return SVG; });
 /*
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Thomas Bluemel
+Copyright (c) 2020 Ynse Hoornenborg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -187,175 +133,521 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-
-
-
-
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Renderer", function() { return Renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WMFRect16", function() { return WMFRect16; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WMFPlacable", function() { return WMFPlacable; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WMF", function() { return WMF; });
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Blob__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(37);
-/* harmony import */ var _GDIContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(39);
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(38);
-/* harmony import */ var _WMFRecords__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(44);
-/*
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Thomas Bluemel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
-
-
-
-
-var Renderer = /** @class */ (function () {
-    function Renderer(blob) {
-        this.parse(blob);
-        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("WMFJS.Renderer instantiated");
+var SVGFilters = /** @class */ (function () {
+    function SVGFilters() {
     }
-    Renderer.prototype.render = function (info) {
-        var _this = this;
-        var img = jquery__WEBPACK_IMPORTED_MODULE_0__("<div>").svg({
-            onLoad: function (svg) {
-                return _this._render(svg, info.mapMode, info.xExt, info.yExt);
-            },
-            settings: {
-                viewBox: [0, 0, info.xExt, info.yExt].join(" "),
-                preserveAspectRatio: "none",
-            },
-        });
-        var svgContainer = jquery__WEBPACK_IMPORTED_MODULE_0__(img[0]).svg("get");
-        return jquery__WEBPACK_IMPORTED_MODULE_0__(svgContainer.root()).attr("width", info.width).attr("height", info.height);
+    SVGFilters.prototype.flood = function (filter, resultId, color, opacity, _settings) {
+        var floodElement = document.createElementNS("http://www.w3.org/2000/svg", "feFlood");
+        if (resultId) {
+            floodElement.setAttribute("id", resultId);
+        }
+        floodElement.setAttribute("flood-color", color);
+        floodElement.setAttribute("flood-opacity", opacity.toString());
+        filter.appendChild(floodElement);
     };
-    Renderer.prototype.parse = function (blob) {
-        this._img = null;
-        var reader = new _Blob__WEBPACK_IMPORTED_MODULE_1__["Blob"](blob);
-        var type;
-        var size;
-        var placable;
-        var headerstart;
-        var key = reader.readUint32();
-        if (key === 0x9ac6cdd7) {
-            placable = new WMFPlacable(reader);
-            headerstart = reader.pos;
-            type = reader.readUint16();
-            size = reader.readUint16();
+    SVGFilters.prototype.composite = function (filter, resultId, in1, in2, k1, k2, k3, k4, _settings) {
+        var compositeElement = document.createElementNS("http://www.w3.org/2000/svg", "feComposite");
+        if (resultId) {
+            compositeElement.setAttribute("id", resultId);
+        }
+        compositeElement.setAttribute("in", in1);
+        compositeElement.setAttribute("in2", in2);
+        filter.appendChild(compositeElement);
+    };
+    return SVGFilters;
+}());
+
+var SVGPathBuilder = /** @class */ (function () {
+    function SVGPathBuilder() {
+        this._path = "";
+    }
+    SVGPathBuilder.prototype.move = function (x, y) {
+        this._path += " M " + x + " " + y;
+    };
+    SVGPathBuilder.prototype.path = function () {
+        return this._path.substr(1);
+    };
+    SVGPathBuilder.prototype.line = function (pts) {
+        var _this = this;
+        pts.forEach(function (point) {
+            _this._path += " L " + point[0] + " " + point[1];
+        });
+    };
+    SVGPathBuilder.prototype.curveC = function (x1, y1, x2, y2, x, y) {
+        this._path += " C " + x1 + " " + y1 + ", " + x2 + " " + y2 + ", " + x + " " + y;
+    };
+    SVGPathBuilder.prototype.close = function () {
+        this._path += " Z";
+    };
+    return SVGPathBuilder;
+}());
+
+var SVG = /** @class */ (function () {
+    function SVG(svg) {
+        this.filters = new SVGFilters();
+        this._defs = undefined;
+        this._svg = svg;
+    }
+    SVG.prototype.svg = function (parent, x, y, width, height, settings) {
+        var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgElement.setAttribute("x", x.toString());
+        svgElement.setAttribute("y", y.toString());
+        svgElement.setAttribute("width", width.toString());
+        svgElement.setAttribute("height", height.toString());
+        this._appendSettings(settings, svgElement);
+        if (parent != null) {
+            parent.appendChild(svgElement);
         }
         else {
-            headerstart = 0;
-            type = key & 0xffff;
-            size = (key >>> 16) & 0xffff;
+            this._svg.appendChild(svgElement);
         }
-        switch (type) {
-            case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileType.MEMORYMETAFILE:
-            case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileType.DISKMETAFILE:
-                if (size === _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.METAHEADER_SIZE / 2) {
-                    var version = reader.readUint16();
-                    switch (version) {
-                        case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileVersion.METAVERSION100:
-                        case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileVersion.METAVERSION300:
-                            this._img = new WMF(reader, placable, version, headerstart + (size * 2));
-                            break;
-                    }
-                }
-                break;
+        return svgElement;
+    };
+    SVG.prototype.image = function (parent, x, y, width, height, url, settings) {
+        var imageElement = document.createElementNS("http://www.w3.org/2000/svg", "image");
+        imageElement.setAttribute("x", x.toString());
+        imageElement.setAttribute("y", y.toString());
+        imageElement.setAttribute("width", width.toString());
+        imageElement.setAttribute("height", height.toString());
+        imageElement.setAttributeNS("http://www.w3.org/1999/xlink", "href", url);
+        this._appendSettings(settings, imageElement);
+        parent.appendChild(imageElement);
+        return imageElement;
+    };
+    SVG.prototype.rect = function (parent, x, y, width, height, rx, ry, settings) {
+        var rectElement = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rectElement.setAttribute("x", x.toString());
+        rectElement.setAttribute("y", y.toString());
+        rectElement.setAttribute("width", width.toString());
+        rectElement.setAttribute("height", height.toString());
+        if (rx !== undefined) {
+            if (rx instanceof Number) {
+                rectElement.setAttribute("rx", rx.toString());
+            }
+            else if (rx instanceof Object) {
+                this._appendSettings(rx, rectElement);
+            }
         }
-        if (this._img == null) {
-            throw new _Helper__WEBPACK_IMPORTED_MODULE_3__["WMFJSError"]("Format not recognized");
+        if (ry !== undefined) {
+            rectElement.setAttribute("ry", ry.toString());
+        }
+        this._appendSettings(settings, rectElement);
+        parent.appendChild(rectElement);
+        return rectElement;
+    };
+    SVG.prototype.line = function (parent, x1, y1, x2, y2, settings) {
+        var lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        lineElement.setAttribute("x1", x1.toString());
+        lineElement.setAttribute("y1", y1.toString());
+        lineElement.setAttribute("x2", x2.toString());
+        lineElement.setAttribute("y2", y2.toString());
+        this._appendSettings(settings, lineElement);
+        parent.appendChild(lineElement);
+        return lineElement;
+    };
+    SVG.prototype.polygon = function (parent, points, settings) {
+        var polygonElement = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        polygonElement.setAttribute("points", points.map(function (point) { return point.join(","); }).join(" "));
+        this._appendSettings(settings, polygonElement);
+        parent.appendChild(polygonElement);
+        return polygonElement;
+    };
+    SVG.prototype.polyline = function (parent, points, settings) {
+        var polylineElement = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        polylineElement.setAttribute("points", points.map(function (point) { return point.join(","); }).join(" "));
+        this._appendSettings(settings, polylineElement);
+        parent.appendChild(polylineElement);
+        return polylineElement;
+    };
+    SVG.prototype.ellipse = function (parent, cx, cy, rx, ry, settings) {
+        var ellipseElement = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        ellipseElement.setAttribute("cx", cx.toString());
+        ellipseElement.setAttribute("cy", cy.toString());
+        ellipseElement.setAttribute("rx", rx.toString());
+        ellipseElement.setAttribute("ry", ry.toString());
+        this._appendSettings(settings, ellipseElement);
+        parent.appendChild(ellipseElement);
+        return ellipseElement;
+    };
+    SVG.prototype.path = function (parent, builder, settings) {
+        var pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathElement.setAttribute("d", builder.path());
+        this._appendSettings(settings, pathElement);
+        parent.appendChild(pathElement);
+        return pathElement;
+    };
+    SVG.prototype.text = function (parent, x, y, value, settings) {
+        var textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        textElement.setAttribute("x", x.toString());
+        textElement.setAttribute("y", y.toString());
+        this._appendSettings(settings, textElement);
+        var textNode = document.createTextNode(value);
+        textElement.appendChild(textNode);
+        parent.appendChild(textElement);
+        return textElement;
+    };
+    SVG.prototype.filter = function (parent, id, x, y, width, height, settings) {
+        var filterElement = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+        filterElement.setAttribute("x", x.toString());
+        filterElement.setAttribute("y", y.toString());
+        filterElement.setAttribute("width", width.toString());
+        filterElement.setAttribute("height", height.toString());
+        this._appendSettings(settings, filterElement);
+        parent.appendChild(filterElement);
+        return filterElement;
+    };
+    SVG.prototype.pattern = function (parent, resultId, x, y, width, height, settings) {
+        var patternElement = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        if (resultId) {
+            patternElement.setAttribute("id", resultId);
+        }
+        patternElement.setAttribute("x", x.toString());
+        patternElement.setAttribute("y", y.toString());
+        patternElement.setAttribute("width", width.toString());
+        patternElement.setAttribute("height", height.toString());
+        this._appendSettings(settings, patternElement);
+        parent.appendChild(patternElement);
+        return patternElement;
+    };
+    SVG.prototype.defs = function () {
+        if (this._defs === undefined) {
+            var defsElement = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            this._svg.appendChild(defsElement);
+            this._defs = defsElement;
+        }
+        return this._defs;
+    };
+    SVG.prototype.clipPath = function (parent, resultId, units, settings) {
+        var clipElement = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
+        if (resultId) {
+            clipElement.setAttribute("id", resultId);
+        }
+        if (units === undefined) {
+            units = "userSpaceOnUse";
+        }
+        clipElement.setAttribute("clipPathUnits", units);
+        this._appendSettings(settings, clipElement);
+        parent.appendChild(clipElement);
+        return clipElement;
+    };
+    SVG.prototype.createPath = function () {
+        return new SVGPathBuilder();
+    };
+    SVG.prototype._appendSettings = function (settings, element) {
+        if (settings !== undefined) {
+            Object.keys(settings).forEach(function (key) {
+                element.setAttribute(key, settings[key]);
+            });
         }
     };
-    Renderer.prototype._render = function (svg, mapMode, xExt, yExt) {
-        // See https://www-user.tu-chemnitz.de/~ygu/petzold/ch18b.htm
-        var gdi = new _GDIContext__WEBPACK_IMPORTED_MODULE_2__["GDIContext"](svg);
-        gdi.setViewportExt(xExt, yExt);
-        gdi.setMapMode(mapMode);
-        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("[WMF] BEGIN RENDERING --->");
-        this._img.render(gdi);
-        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("[WMF] <--- DONE RENDERING");
-    };
-    return Renderer;
-}());
-
-var WMFRect16 = /** @class */ (function () {
-    function WMFRect16(reader) {
-        this.left = reader.readInt16();
-        this.top = reader.readInt16();
-        this.right = reader.readInt16();
-        this.bottom = reader.readInt16();
-    }
-    WMFRect16.prototype.toString = function () {
-        return "{left: " + this.left + ", top: " + this.top + ", right: " + this.right
-            + ", bottom: " + this.bottom + "}";
-    };
-    return WMFRect16;
-}());
-
-var WMFPlacable = /** @class */ (function () {
-    function WMFPlacable(reader) {
-        reader.skip(2);
-        this.boundingBox = new WMFRect16(reader);
-        this.unitsPerInch = reader.readInt16();
-        reader.skip(4);
-        reader.skip(2); // TODO: checksum
-        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("Got bounding box " + this.boundingBox + " and " + this.unitsPerInch + " units/inch");
-    }
-    return WMFPlacable;
-}());
-
-var WMF = /** @class */ (function () {
-    function WMF(reader, placable, version, hdrsize) {
-        this._version = version;
-        this._hdrsize = hdrsize;
-        this._placable = placable;
-        this._records = new _WMFRecords__WEBPACK_IMPORTED_MODULE_4__["WMFRecords"](reader, this._hdrsize);
-    }
-    WMF.prototype.render = function (gdi) {
-        this._records.play(gdi);
-    };
-    return WMF;
+    return SVG;
 }());
 
 
 
 /***/ }),
-/* 37 */
+
+/***/ "./src/util/index.ts":
+/*!***************************!*\
+  !*** ./src/util/index.ts ***!
+  \***************************/
+/*! exports provided: SVG */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _SVG__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SVG */ "./src/util/SVG.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SVG", function() { return _SVG__WEBPACK_IMPORTED_MODULE_0__["SVG"]; });
+
+/*
+
+The MIT License (MIT)
+
+Copyright (c) 2020 Tom Zoehner
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+
+
+/***/ }),
+
+/***/ "./src/wmfjs/Bitmap.ts":
+/*!*****************************!*\
+  !*** ./src/wmfjs/Bitmap.ts ***!
+  \*****************************/
+/*! exports provided: BitmapInfo, DIBitmap, Bitmap16, PatternBitmap16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BitmapInfo", function() { return BitmapInfo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DIBitmap", function() { return DIBitmap; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Bitmap16", function() { return Bitmap16; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PatternBitmap16", function() { return PatternBitmap16; });
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Thomas Bluemel
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var BitmapCoreHeader = /** @class */ (function () {
+    function BitmapCoreHeader(reader, skipsize) {
+        if (skipsize) {
+            reader.skip(4);
+        }
+        this.width = reader.readUint16();
+        this.height = reader.readUint16();
+        this.planes = reader.readUint16();
+        this.bitcount = reader.readUint16();
+    }
+    BitmapCoreHeader.prototype.colors = function () {
+        return this.bitcount <= 8 ? 1 << this.bitcount : 0;
+    };
+    return BitmapCoreHeader;
+}());
+var BitmapInfoHeader = /** @class */ (function () {
+    function BitmapInfoHeader(reader, skipsize) {
+        if (skipsize) {
+            reader.skip(4);
+        }
+        this.width = reader.readInt32();
+        this.height = reader.readInt32();
+        this.planes = reader.readUint16();
+        this.bitcount = reader.readUint16();
+        this.compression = reader.readUint32();
+        this.sizeimage = reader.readUint32();
+        this.xpelspermeter = reader.readInt32();
+        this.ypelspermeter = reader.readInt32();
+        this.clrused = reader.readUint32();
+        this.clrimportant = reader.readUint32();
+    }
+    BitmapInfoHeader.prototype.colors = function () {
+        if (this.clrused !== 0) {
+            return this.clrused < 256 ? this.clrused : 256;
+        }
+        else {
+            return this.bitcount > 8 ? 0 : 1 << this.bitcount;
+        }
+    };
+    return BitmapInfoHeader;
+}());
+var BitmapInfo = /** @class */ (function () {
+    function BitmapInfo(reader, usergb) {
+        this._reader = reader;
+        this._offset = reader.pos;
+        this._usergb = usergb;
+        var hdrsize = reader.readUint32();
+        this._infosize = hdrsize;
+        if (hdrsize === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPCOREHEADER_SIZE) {
+            this._header = new BitmapCoreHeader(reader, false);
+            this._infosize += this._header.colors() * (usergb ? 3 : 2);
+        }
+        else {
+            this._header = new BitmapInfoHeader(reader, false);
+            var masks = this._header.compression === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_BITFIELDS ? 3 : 0;
+            if (hdrsize <= _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPINFOHEADER_SIZE + (masks * 4)) {
+                this._infosize = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPINFOHEADER_SIZE + (masks * 4);
+            }
+            this._infosize += this._header.colors() * (usergb ? 4 : 2);
+        }
+    }
+    BitmapInfo.prototype.getWidth = function () {
+        return this._header.width;
+    };
+    BitmapInfo.prototype.getHeight = function () {
+        return Math.abs(this._header.height);
+    };
+    BitmapInfo.prototype.infosize = function () {
+        return this._infosize;
+    };
+    BitmapInfo.prototype.header = function () {
+        return this._header;
+    };
+    return BitmapInfo;
+}());
+
+var DIBitmap = /** @class */ (function () {
+    function DIBitmap(reader, size) {
+        this._reader = reader;
+        this._offset = reader.pos;
+        this._size = size;
+        this._info = new BitmapInfo(reader, true);
+    }
+    DIBitmap.prototype.getWidth = function () {
+        return this._info.getWidth();
+    };
+    DIBitmap.prototype.getHeight = function () {
+        return this._info.getHeight();
+    };
+    DIBitmap.prototype.base64ref = function () {
+        var prevpos = this._reader.pos;
+        this._reader.seek(this._offset);
+        var mime = "image/bmp";
+        var header = this._info.header();
+        var data;
+        if (header instanceof BitmapInfoHeader && header.compression != null) {
+            switch (header.compression) {
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_JPEG:
+                    mime = "data:image/jpeg";
+                    break;
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_PNG:
+                    mime = "data:image/png";
+                    break;
+                default:
+                    data = this.makeBitmapFileHeader();
+                    break;
+            }
+        }
+        else {
+            data = this.makeBitmapFileHeader();
+        }
+        if (data != null) {
+            data += this._reader.readBinary(this._size);
+        }
+        else {
+            data = this._reader.readBinary(this._size);
+        }
+        var ref = "data:" + mime + ";base64," + btoa(data);
+        this._reader.seek(prevpos);
+        return ref;
+    };
+    DIBitmap.prototype.makeBitmapFileHeader = function () {
+        var buf = new ArrayBuffer(14);
+        var view = new Uint8Array(buf);
+        view[0] = 0x42;
+        view[1] = 0x4d;
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._writeUint32Val(view, 2, this._size + 14);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._writeUint32Val(view, 10, this._info.infosize() + 14);
+        return _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._blobToBinary(view);
+    };
+    return DIBitmap;
+}());
+
+var Bitmap16 = /** @class */ (function () {
+    function Bitmap16(reader, size) {
+        if (reader != null) {
+            size = size;
+            this._reader = reader;
+            this._offset = reader.pos;
+            this._size = size;
+            this.type = reader.readInt16();
+            this.width = reader.readInt16();
+            this.height = reader.readInt16();
+            this.widthBytes = reader.readInt16();
+            this.planes = reader.readUint8();
+            this.bitsPixel = reader.readUint8();
+            this.bitsOffset = reader.pos;
+            this.bitsSize = (((this.width * this.bitsPixel + 15) >> 4) << 1) * this.height;
+            if (this.bitsSize > size - 10) {
+                throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("Bitmap should have " + this.bitsSize + " bytes, but has " + (size - 10));
+            }
+        }
+        else {
+            var copy = size;
+            this._reader = copy._reader;
+            this._offset = copy._offset;
+            this._size = copy._size;
+            this.type = copy.type;
+            this.width = copy.width;
+            this.height = copy.height;
+            this.widthBytes = copy.widthBytes;
+            this.planes = copy.planes;
+            this.bitsPixel = copy.bitsPixel;
+            this.bitsOffset = copy.bitsOffset;
+            this.bitsSize = copy.bitsSize;
+        }
+    }
+    Bitmap16.prototype.getWidth = function () {
+        return this.width;
+    };
+    Bitmap16.prototype.getHeight = function () {
+        return this.height;
+    };
+    Bitmap16.prototype.clone = function () {
+        return new Bitmap16(null, this);
+    };
+    return Bitmap16;
+}());
+
+var PatternBitmap16 = /** @class */ (function (_super) {
+    __extends(PatternBitmap16, _super);
+    function PatternBitmap16(reader, size) {
+        var _this = _super.call(this, reader, size) || this;
+        if (reader != null) {
+            _this.bitsOffset += 22; // skip bits (4 bytes) + reserved (18 bytes)
+        }
+        return _this;
+    }
+    PatternBitmap16.prototype.clone = function () {
+        return new PatternBitmap16(null, this);
+    };
+    return PatternBitmap16;
+}(Bitmap16));
+
+
+
+/***/ }),
+
+/***/ "./src/wmfjs/Blob.ts":
+/*!***************************!*\
+  !*** ./src/wmfjs/Blob.ts ***!
+  \***************************/
+/*! exports provided: Blob */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blob", function() { return Blob; });
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(38);
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
 /*
 
 The MIT License (MIT)
@@ -492,7 +784,729 @@ var Blob = /** @class */ (function () {
 
 
 /***/ }),
-/* 38 */
+
+/***/ "./src/wmfjs/GDIContext.ts":
+/*!*********************************!*\
+  !*** ./src/wmfjs/GDIContext.ts ***!
+  \*********************************/
+/*! exports provided: GDIContext */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GDIContext", function() { return GDIContext; });
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Primitives */ "./src/wmfjs/Primitives.ts");
+/* harmony import */ var _Region__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Region */ "./src/wmfjs/Region.ts");
+/* harmony import */ var _Style__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Style */ "./src/wmfjs/Style.ts");
+/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Thomas Bluemel
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+
+
+
+var GDIContextState = /** @class */ (function () {
+    function GDIContextState(copy, defObjects) {
+        if (copy != null) {
+            this._svggroup = copy._svggroup;
+            this._svgclipChanged = copy._svgclipChanged;
+            this._svgtextbkfilter = copy._svgtextbkfilter;
+            this.mapmode = copy.mapmode;
+            this.stretchmode = copy.stretchmode;
+            this.textalign = copy.textalign;
+            this.bkmode = copy.bkmode;
+            this.textcolor = copy.textcolor.clone();
+            this.bkcolor = copy.bkcolor.clone();
+            this.polyfillmode = copy.polyfillmode;
+            this.wx = copy.wx;
+            this.wy = copy.wy;
+            this.ww = copy.ww;
+            this.wh = copy.wh;
+            this.vx = copy.vx;
+            this.vy = copy.vy;
+            this.vw = copy.vw;
+            this.vh = copy.vh;
+            this.x = copy.x;
+            this.y = copy.y;
+            this.clip = copy.clip;
+            this.ownclip = false;
+            this.selected = {};
+            for (var type in copy.selected) {
+                this.selected[type] = copy.selected[type];
+            }
+        }
+        else {
+            this._svggroup = null;
+            this._svgclipChanged = false;
+            this._svgtextbkfilter = null;
+            this.mapmode = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.MapMode.MM_ANISOTROPIC;
+            this.stretchmode = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.StretchMode.COLORONCOLOR;
+            this.textalign = 0; // TA_LEFT | TA_TOP | TA_NOUPDATECP
+            this.bkmode = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.MixMode.OPAQUE;
+            this.textcolor = new _Style__WEBPACK_IMPORTED_MODULE_3__["ColorRef"](null, 0, 0, 0);
+            this.bkcolor = new _Style__WEBPACK_IMPORTED_MODULE_3__["ColorRef"](null, 255, 255, 255);
+            this.polyfillmode = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PolyFillMode.ALTERNATE;
+            this.wx = 0;
+            this.wy = 0;
+            this.ww = 0;
+            this.wh = 0;
+            this.vx = 0;
+            this.vy = 0;
+            this.vw = 0;
+            this.vh = 0;
+            this.x = 0;
+            this.y = 0;
+            this.clip = null;
+            this.ownclip = false;
+            this.selected = {};
+            for (var type in defObjects) {
+                var defObj = defObjects[type];
+                this.selected[type] = defObj != null ? defObj.clone() : null;
+            }
+        }
+    }
+    return GDIContextState;
+}());
+var GDIContext = /** @class */ (function () {
+    function GDIContext(svg) {
+        this._svg = svg;
+        this._svgdefs = null;
+        this._svgPatterns = {};
+        this._svgClipPaths = {};
+        this.defObjects = {
+            brush: new _Style__WEBPACK_IMPORTED_MODULE_3__["Brush"](null, null),
+            pen: new _Style__WEBPACK_IMPORTED_MODULE_3__["Pen"](null, _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_SOLID, new _Primitives__WEBPACK_IMPORTED_MODULE_1__["PointS"](null, 1, 1), new _Style__WEBPACK_IMPORTED_MODULE_3__["ColorRef"](null, 0, 0, 0), 0, 0),
+            font: new _Style__WEBPACK_IMPORTED_MODULE_3__["Font"](null, null),
+            palette: null,
+            region: null,
+        };
+        this.state = new GDIContextState(null, this.defObjects);
+        this.statestack = [this.state];
+        this.objects = {};
+    }
+    GDIContext.prototype.setMapMode = function (mode) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setMapMode: mode=" + mode);
+        this.state.mapmode = mode;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.setWindowOrg = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setWindowOrg: x=" + x + " y=" + y);
+        this.state.wx = x;
+        this.state.wy = y;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.setWindowExt = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setWindowExt: x=" + x + " y=" + y);
+        this.state.ww = x;
+        this.state.wh = y;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.offsetWindowOrg = function (offX, offY) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] offsetWindowOrg: offX=" + offX + " offY=" + offY);
+        this.state.wx += offX;
+        this.state.wy += offY;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.setViewportOrg = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setViewportOrg: x=" + x + " y=" + y);
+        this.state.vx = x;
+        this.state.vy = y;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.setViewportExt = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setViewportExt: x=" + x + " y=" + y);
+        this.state.vw = x;
+        this.state.vh = y;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.offsetViewportOrg = function (offX, offY) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] offsetViewportOrg: offX=" + offX + " offY=" + offY);
+        this.state.vx += offX;
+        this.state.vy += offY;
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.saveDC = function () {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] saveDC");
+        var prevstate = this.state;
+        this.state = new GDIContextState(this.state);
+        this.statestack.push(prevstate);
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.restoreDC = function (saved) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] restoreDC: saved=" + saved);
+        if (this.statestack.length > 1) {
+            if (saved === -1) {
+                this.state = this.statestack.pop();
+            }
+            else if (saved < -1) {
+                throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("restoreDC: relative restore not implemented");
+            }
+            else if (saved > 1) {
+                throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("restoreDC: absolute restore not implemented");
+            }
+        }
+        else {
+            throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("No saved contexts");
+        }
+        this.state._svggroup = null;
+    };
+    GDIContext.prototype.escape = function (func, blob, offset, count) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] escape: func=" + func + " offset=" + offset + " count=" + count);
+    };
+    GDIContext.prototype.setStretchBltMode = function (stretchMode) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setStretchBltMode: stretchMode=" + stretchMode);
+    };
+    GDIContext.prototype.stretchDib = function (srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH, rasterOp, colorUsage, dib) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] stretchDib: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
+            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
+            + " rasterOp=0x" + rasterOp.toString(16));
+        srcX = this._todevX(srcX);
+        srcY = this._todevY(srcY);
+        srcW = this._todevW(srcW);
+        srcH = this._todevH(srcH);
+        dstX = this._todevX(dstX);
+        dstY = this._todevY(dstY);
+        dstW = this._todevW(dstW);
+        dstH = this._todevH(dstH);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] stretchDib: TRANSLATED: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
+            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
+            + " rasterOp=0x" + rasterOp.toString(16) + " colorUsage=0x" + colorUsage.toString(16));
+        this._pushGroup();
+        this._svg.image(this.state._svggroup, dstX, dstY, dstW, dstH, dib.base64ref());
+    };
+    GDIContext.prototype.dibBits = function (srcX, srcY, dstX, dstY, width, height, rasterOp, dib) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] stretchDibBits: srcX=" + srcX + " srcY=" + srcY
+            + " dstX=" + dstX + " dstY=" + dstY + " width=" + width + " height=" + height
+            + " rasterOp=0x" + rasterOp.toString(16));
+        srcX = this._todevX(srcX);
+        srcY = this._todevY(srcY);
+        dstX = this._todevX(dstX);
+        dstY = this._todevY(dstY);
+        width = this._todevW(width);
+        height = this._todevH(height);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] dibBits: TRANSLATED:"
+            + " srcX=" + srcX + " srcY=" + srcY + +" dstX=" + dstX + " dstY=" + dstY
+            + " width=" + width + " height=" + height + " rasterOp=0x" + rasterOp.toString(16));
+        this._pushGroup();
+        this._svg.image(this.state._svggroup, dstX, dstY, width, height, dib.base64ref());
+    };
+    GDIContext.prototype.stretchDibBits = function (srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH, rasterOp, dib) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] stretchDibBits: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
+            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
+            + " rasterOp=0x" + rasterOp.toString(16));
+        srcX = this._todevX(srcX);
+        srcY = this._todevY(srcY);
+        srcW = this._todevW(srcW);
+        srcH = this._todevH(srcH);
+        dstX = this._todevX(dstX);
+        dstY = this._todevY(dstY);
+        dstW = this._todevW(dstW);
+        dstH = this._todevH(dstH);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] stretchDibBits: TRANSLATED:"
+            + " srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
+            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
+            + " rasterOp=0x" + rasterOp.toString(16));
+        this._pushGroup();
+        this._svg.image(this.state._svggroup, dstX, dstY, dstW, dstH, dib.base64ref());
+    };
+    GDIContext.prototype.rectangle = function (rect, rw, rh) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] rectangle: rect=" + rect.toString() + " with pen " + this.state.selected.pen.toString()
+            + " and brush " + this.state.selected.brush.toString());
+        var bottom = this._todevY(rect.bottom);
+        var right = this._todevX(rect.right);
+        var top = this._todevY(rect.top);
+        var left = this._todevX(rect.left);
+        rw = this._todevH(rw);
+        rh = this._todevH(rh);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] rectangle: TRANSLATED: bottom=" + bottom + " right=" + right + " top=" + top
+            + " left=" + left + " rh=" + rh + " rw=" + rw);
+        this._pushGroup();
+        var opts = this._applyOpts(null, true, true, false);
+        this._svg.rect(this.state._svggroup, left, top, right - left, bottom - top, rw / 2, rh / 2, opts);
+    };
+    GDIContext.prototype.textOut = function (x, y, text) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] textOut: x=" + x + " y=" + y + " text=" + text
+            + " with font " + this.state.selected.font.toString());
+        x = this._todevX(x);
+        y = this._todevY(y);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] textOut: TRANSLATED: x=" + x + " y=" + y);
+        this._pushGroup();
+        var opts = this._applyOpts(null, false, false, true);
+        if (this.state.selected.font.escapement !== 0) {
+            opts.transform = "rotate(" + [(-this.state.selected.font.escapement / 10), x, y] + ")";
+            opts.style = "dominant-baseline: middle; text-anchor: start;";
+        }
+        if (this.state.bkmode === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.MixMode.OPAQUE) {
+            if (this.state._svgtextbkfilter == null) {
+                var filterId = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._makeUniqueId("f");
+                var filter = this._svg.filter(this._getSvgDef(), filterId, 0, 0, 1, 1);
+                this._svg.filters.flood(filter, null, "#" + this.state.bkcolor.toHex(), 1.0);
+                this._svg.filters.composite(filter, null, null, "SourceGraphic");
+                this.state._svgtextbkfilter = filter;
+            }
+            opts.filter = "url(#" + this.state._svgtextbkfilter.id + ")";
+        }
+        this._svg.text(this.state._svggroup, x, y, text, opts);
+    };
+    GDIContext.prototype.extTextOut = function (x, y, text, fwOpts, rect, dx) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] extTextOut: x=" + x + " y=" + y + " text=" + text
+            + " with font " + this.state.selected.font.toString());
+        x = this._todevX(x);
+        y = this._todevY(y);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] extTextOut: TRANSLATED: x=" + x + " y=" + y);
+        this._pushGroup();
+        var opts = this._applyOpts(null, false, false, true);
+        if (this.state.selected.font.escapement !== 0) {
+            opts.transform = "rotate(" + [(-this.state.selected.font.escapement / 10), x, y] + ")";
+            opts.style = "dominant-baseline: middle; text-anchor: start;";
+        }
+        if (this.state.bkmode === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.MixMode.OPAQUE) {
+            if (this.state._svgtextbkfilter == null) {
+                var filterId = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._makeUniqueId("f");
+                var filter = this._svg.filter(this._getSvgDef(), filterId, 0, 0, 1, 1);
+                this._svg.filters.flood(filter, null, "#" + this.state.bkcolor.toHex(), 1.0);
+                this._svg.filters.composite(filter, null, null, "SourceGraphic");
+                this.state._svgtextbkfilter = filter;
+            }
+            opts.filter = "url(#" + this.state._svgtextbkfilter.id + ")";
+        }
+        this._svg.text(this.state._svggroup, x, y, text, opts);
+    };
+    GDIContext.prototype.lineTo = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] lineTo: x=" + x + " y=" + y + " with pen " + this.state.selected.pen.toString());
+        var toX = this._todevX(x);
+        var toY = this._todevY(y);
+        var fromX = this._todevX(this.state.x);
+        var fromY = this._todevY(this.state.y);
+        // Update position
+        this.state.x = x;
+        this.state.y = y;
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] lineTo: TRANSLATED: toX=" + toX + " toY=" + toY + " fromX=" + fromX + " fromY=" + fromY);
+        this._pushGroup();
+        var opts = this._applyOpts(null, true, false, false);
+        this._svg.line(this.state._svggroup, fromX, fromY, toX, toY, opts);
+    };
+    GDIContext.prototype.moveTo = function (x, y) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] moveTo: x=" + x + " y=" + y);
+        this.state.x = x;
+        this.state.y = y;
+    };
+    GDIContext.prototype.polygon = function (points, first) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] polygon: points=" + points + " with pen " + this.state.selected.pen.toString()
+            + " and brush " + this.state.selected.brush.toString());
+        var pts = [];
+        for (var i = 0; i < points.length; i++) {
+            var point = points[i];
+            pts.push([this._todevX(point.x), this._todevY(point.y)]);
+        }
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] polygon: TRANSLATED: pts=" + pts);
+        if (first) {
+            this._pushGroup();
+        }
+        var opts = {
+            "fill-rule": this.state.polyfillmode === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PolyFillMode.ALTERNATE ? "evenodd" : "nonzero",
+        };
+        this._applyOpts(opts, true, true, false);
+        this._svg.polygon(this.state._svggroup, pts, opts);
+    };
+    GDIContext.prototype.polyPolygon = function (polygons) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] polyPolygon: polygons.length=" + polygons.length
+            + " with pen " + this.state.selected.pen.toString()
+            + " and brush " + this.state.selected.brush.toString());
+        var cnt = polygons.length;
+        for (var i = 0; i < cnt; i++) {
+            this.polygon(polygons[i], i === 0);
+        }
+    };
+    GDIContext.prototype.polyline = function (points) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] polyline: points=" + points + " with pen " + this.state.selected.pen.toString());
+        var pts = [];
+        for (var i = 0; i < points.length; i++) {
+            var point = points[i];
+            pts.push([this._todevX(point.x), this._todevY(point.y)]);
+        }
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] polyline: TRANSLATED: pts=" + pts);
+        this._pushGroup();
+        var opts = this._applyOpts({ fill: "none" }, true, false, false);
+        this._svg.polyline(this.state._svggroup, pts, opts);
+    };
+    GDIContext.prototype.ellipse = function (rect) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] ellipse: rect=" + rect.toString() + " with pen " + this.state.selected.pen.toString()
+            + " and brush " + this.state.selected.brush.toString());
+        var bottom = this._todevY(rect.bottom);
+        var right = this._todevX(rect.right);
+        var top = this._todevY(rect.top);
+        var left = this._todevX(rect.left);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] ellipse: TRANSLATED: bottom=" + bottom + " right=" + right + " top=" + top + " left=" + left);
+        this._pushGroup();
+        var width2 = (right - left) / 2;
+        var height2 = (bottom - top) / 2;
+        var opts = this._applyOpts(null, true, true, false);
+        this._svg.ellipse(this.state._svggroup, left + width2, top + height2, width2, height2, opts);
+    };
+    GDIContext.prototype.excludeClipRect = function (rect) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] excludeClipRect: rect=" + rect.toString());
+        this._getClipRgn().subtract(rect);
+    };
+    GDIContext.prototype.intersectClipRect = function (rect) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] intersectClipRect: rect=" + rect.toString());
+        this._getClipRgn().intersect(rect);
+    };
+    GDIContext.prototype.offsetClipRgn = function (offX, offY) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] offsetClipRgn: offX=" + offX + " offY=" + offY);
+        this._getClipRgn().offset(offX, offY);
+    };
+    GDIContext.prototype.setTextAlign = function (textAlignmentMode) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setTextAlign: textAlignmentMode=0x" + textAlignmentMode.toString(16));
+        this.state.textalign = textAlignmentMode;
+    };
+    GDIContext.prototype.setBkMode = function (bkMode) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setBkMode: bkMode=0x" + bkMode.toString(16));
+        this.state.bkmode = bkMode;
+    };
+    GDIContext.prototype.setTextColor = function (textColor) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setTextColor: textColor=" + textColor.toString());
+        this.state.textcolor = textColor;
+    };
+    GDIContext.prototype.setBkColor = function (bkColor) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setBkColor: bkColor=" + bkColor.toString());
+        this.state.bkcolor = bkColor;
+        this.state._svgtextbkfilter = null;
+    };
+    GDIContext.prototype.setPolyFillMode = function (polyFillMode) {
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] setPolyFillMode: polyFillMode=" + polyFillMode);
+        this.state.polyfillmode = polyFillMode;
+    };
+    GDIContext.prototype.createBrush = function (brush) {
+        var idx = this._storeObject(brush);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createBrush: brush=" + brush.toString() + " with handle " + idx);
+    };
+    GDIContext.prototype.createFont = function (font) {
+        var idx = this._storeObject(font);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createFont: font=" + font.toString() + " with handle " + idx);
+    };
+    GDIContext.prototype.createPen = function (pen) {
+        var idx = this._storeObject(pen);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createPen: pen=" + pen.toString() + " width handle " + idx);
+    };
+    GDIContext.prototype.createPalette = function (palette) {
+        var idx = this._storeObject(palette);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createPalette: palette=" + palette.toString() + " width handle " + idx);
+    };
+    GDIContext.prototype.createRegion = function (region) {
+        var idx = this._storeObject(region);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createRegion: region=" + region.toString() + " width handle " + idx);
+    };
+    GDIContext.prototype.createPatternBrush = function (patternBrush) {
+        var idx = this._storeObject(patternBrush);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] createRegion: region=" + patternBrush.toString() + " width handle " + idx);
+    };
+    GDIContext.prototype.selectObject = function (objIdx, checkType) {
+        var obj = this._getObject(objIdx);
+        if (obj != null && (checkType == null || obj.type === checkType)) {
+            this._selectObject(obj);
+            _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] selectObject: objIdx=" + objIdx
+                + (obj ? " selected " + obj.type + ": " + obj.toString() : "[invalid index]"));
+        }
+        else {
+            _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] selectObject: objIdx=" + objIdx
+                + (obj ? " invalid object type: " + obj.type : "[invalid index]"));
+        }
+    };
+    GDIContext.prototype.deleteObject = function (objIdx) {
+        var ret = this._deleteObject(objIdx);
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] deleteObject: objIdx=" + objIdx + (ret ? " deleted object" : "[invalid index]"));
+    };
+    GDIContext.prototype._pushGroup = function () {
+        if (this.state._svggroup == null || this.state._svgclipChanged) {
+            this.state._svgclipChanged = false;
+            this.state._svgtextbkfilter = null;
+            var settings = {
+                viewBox: [this.state.vx, this.state.vy, this.state.vw, this.state.vh].join(" "),
+                preserveAspectRatio: "none",
+            };
+            if (this.state.clip != null) {
+                _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] new svg x=" + this.state.vx + " y=" + this.state.vy
+                    + " width=" + this.state.vw + " height=" + this.state.vh + " with clipping");
+                settings["clip-path"] = "url(#" + this._getSvgClipPathForRegion(this.state.clip) + ")";
+            }
+            else {
+                _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] new svg x=" + this.state.vx + " y=" + this.state.vy
+                    + " width=" + this.state.vw + " height=" + this.state.vh + " without clipping");
+            }
+            this.state._svggroup = this._svg.svg(this.state._svggroup, this.state.vx, this.state.vy, this.state.vw, this.state.vh, settings);
+        }
+    };
+    GDIContext.prototype._storeObject = function (obj) {
+        var i = 0;
+        while (this.objects[i.toString()] != null && i <= 65535) {
+            i++;
+        }
+        if (i > 65535) {
+            _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] Too many objects!");
+            return -1;
+        }
+        this.objects[i.toString()] = obj;
+        return i;
+    };
+    GDIContext.prototype._getObject = function (objIdx) {
+        var obj = this.objects[objIdx.toString()];
+        if (obj == null) {
+            _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] No object with handle " + objIdx);
+        }
+        return obj;
+    };
+    GDIContext.prototype._getSvgDef = function () {
+        if (this._svgdefs == null) {
+            this._svgdefs = this._svg.defs();
+        }
+        return this._svgdefs;
+    };
+    GDIContext.prototype._getSvgClipPathForRegion = function (region) {
+        for (var existingId in this._svgClipPaths) {
+            var rgn = this._svgClipPaths[existingId];
+            if (rgn === region) {
+                return existingId;
+            }
+        }
+        var id = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._makeUniqueId("c");
+        var sclip = this._svg.clipPath(this._getSvgDef(), id, "userSpaceOnUse");
+        switch (region.complexity) {
+            case 1:
+                this._svg.rect(sclip, this._todevX(region.bounds.left), this._todevY(region.bounds.top), this._todevW(region.bounds.right - region.bounds.left), this._todevH(region.bounds.bottom - region.bounds.top), { "fill": "black", "stroke-width": 0 });
+                break;
+            case 2:
+                for (var i = 0; i < region.scans.length; i++) {
+                    var scan = region.scans[i];
+                    for (var j = 0; j < scan.scanlines.length; j++) {
+                        var scanline = scan.scanlines[j];
+                        this._svg.rect(sclip, this._todevX(scanline.left), this._todevY(scan.top), this._todevW(scanline.right - scanline.left), this._todevH(scan.bottom - scan.top), { "fill": "black", "stroke-width": 0 });
+                    }
+                }
+                break;
+        }
+        this._svgClipPaths[id] = region;
+        return id;
+    };
+    GDIContext.prototype._getSvgPatternForBrush = function (brush) {
+        for (var existingId in this._svgPatterns) {
+            var pat = this._svgPatterns[existingId];
+            if (pat === brush) {
+                return existingId;
+            }
+        }
+        var width;
+        var height;
+        var img;
+        switch (brush.style) {
+            case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_PATTERN:
+                width = brush.pattern.getWidth();
+                height = brush.pattern.getHeight();
+                break;
+            case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_DIBPATTERNPT:
+                width = brush.dibpatternpt.getWidth();
+                height = brush.dibpatternpt.getHeight();
+                img = brush.dibpatternpt.base64ref();
+                break;
+            default:
+                throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("Invalid brush style");
+        }
+        var id = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._makeUniqueId("p");
+        var spat = this._svg.pattern(this._getSvgDef(), id, 0, 0, width, height, { patternUnits: "userSpaceOnUse" });
+        this._svg.image(spat, 0, 0, width, height, img);
+        this._svgPatterns[id] = brush;
+        return id;
+    };
+    GDIContext.prototype._selectObject = function (obj) {
+        this.state.selected[obj.type] = obj;
+        if (obj.type === "region") {
+            this.state._svgclipChanged = true;
+        }
+    };
+    GDIContext.prototype._deleteObject = function (objIdx) {
+        var obj = this.objects[objIdx.toString()];
+        if (obj != null) {
+            for (var i = 0; i < this.statestack.length; i++) {
+                var state = this.statestack[i];
+                if (state.selected[obj.type] === obj) {
+                    state.selected[obj.type] = this.defObjects[obj.type].clone();
+                }
+            }
+            delete this.objects[objIdx.toString()];
+            return true;
+        }
+        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] Cannot delete object with invalid handle " + objIdx);
+        return false;
+    };
+    GDIContext.prototype._getClipRgn = function () {
+        if (this.state.clip != null) {
+            if (!this.state.ownclip) {
+                this.state.clip = this.state.clip.clone();
+            }
+        }
+        else {
+            if (this.state.selected.region != null) {
+                this.state.clip = this.state.selected.region.clone();
+            }
+            else {
+                this.state.clip = Object(_Region__WEBPACK_IMPORTED_MODULE_2__["CreateSimpleRegion"])(this.state.wx, this.state.wy, this.state.wx + this.state.ww, this.state.wy + this.state.wh);
+            }
+        }
+        this.state.ownclip = true;
+        return this.state.clip;
+    };
+    GDIContext.prototype._todevX = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor((val - this.state.wx) * (this.state.vw / this.state.ww)) + this.state.vx;
+    };
+    GDIContext.prototype._todevY = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor((val - this.state.wy) * (this.state.vh / this.state.wh)) + this.state.vy;
+    };
+    GDIContext.prototype._todevW = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor(val * (this.state.vw / this.state.ww)) + this.state.vx;
+    };
+    GDIContext.prototype._todevH = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor(val * (this.state.vh / this.state.wh)) + this.state.vy;
+    };
+    GDIContext.prototype._tologicalX = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor((val - this.state.vx) / (this.state.vw / this.state.ww)) + this.state.wx;
+    };
+    GDIContext.prototype._tologicalY = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor((val - this.state.vy) / (this.state.vh / this.state.wh)) + this.state.wy;
+    };
+    GDIContext.prototype._tologicalW = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor(val / (this.state.vw / this.state.ww)) + this.state.wx;
+    };
+    GDIContext.prototype._tologicalH = function (val) {
+        // http://wvware.sourceforge.net/caolan/mapmode.html
+        // logical -> device
+        return Math.floor(val / (this.state.vh / this.state.wh)) + this.state.wy;
+    };
+    GDIContext.prototype._applyOpts = function (opts, usePen, useBrush, useFont) {
+        if (opts == null) {
+            opts = {};
+        }
+        if (usePen) {
+            var pen = this.state.selected.pen;
+            if (pen.style !== _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_NULL) {
+                opts.stroke = "#" + pen.color.toHex(), // TODO: pen style
+                    opts["stroke-width"] = this._todevW(pen.width.x); // TODO: is .y ever used?
+                var dotWidth = void 0;
+                if ((pen.linecap & _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_ENDCAP_SQUARE) !== 0) {
+                    opts["stroke-linecap"] = "square";
+                    dotWidth = 1;
+                }
+                else if ((pen.linecap & _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_ENDCAP_FLAT) !== 0) {
+                    opts["stroke-linecap"] = "butt";
+                    dotWidth = opts["stroke-width"];
+                }
+                else {
+                    opts["stroke-linecap"] = "round";
+                    dotWidth = 1;
+                }
+                if ((pen.join & _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_JOIN_BEVEL) !== 0) {
+                    opts["stroke-linejoin"] = "bevel";
+                }
+                else if ((pen.join & _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_JOIN_MITER) !== 0) {
+                    opts["stroke-linejoin"] = "miter";
+                }
+                else {
+                    opts["stroke-linejoin"] = "round";
+                }
+                var dashWidth = opts["stroke-width"] * 4;
+                var dotSpacing = opts["stroke-width"] * 2;
+                switch (pen.style) {
+                    case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_DASH:
+                        opts["stroke-dasharray"] = [dashWidth, dotSpacing].toString();
+                        break;
+                    case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_DOT:
+                        opts["stroke-dasharray"] = [dotWidth, dotSpacing].toString();
+                        break;
+                    case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_DASHDOT:
+                        opts["stroke-dasharray"] = [dashWidth, dotSpacing, dotWidth, dotSpacing].toString();
+                        break;
+                    case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.PenStyle.PS_DASHDOTDOT:
+                        opts["stroke-dasharray"]
+                            = [dashWidth, dotSpacing, dotWidth, dotSpacing, dotWidth, dotSpacing].toString();
+                        break;
+                }
+            }
+        }
+        if (useBrush) {
+            var brush = this.state.selected.brush;
+            switch (brush.style) {
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_SOLID:
+                    opts.fill = "#" + brush.color.toHex();
+                    break;
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_PATTERN:
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_DIBPATTERNPT:
+                    opts.fill = "url(#" + this._getSvgPatternForBrush(brush) + ")";
+                    break;
+                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BrushStyle.BS_NULL:
+                    opts.fill = "none";
+                    break;
+                default:
+                    _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[gdi] unsupported brush style: " + brush.style);
+                    opts.fill = "none";
+                    break;
+            }
+        }
+        if (useFont) {
+            var font = this.state.selected.font;
+            opts["font-family"] = font.facename;
+            opts["font-size"] = this._todevH(Math.abs(font.height));
+            opts.fill = "#" + this.state.textcolor.toHex();
+        }
+        return opts;
+    };
+    return GDIContext;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/wmfjs/Helper.ts":
+/*!*****************************!*\
+  !*** ./src/wmfjs/Helper.ts ***!
+  \*****************************/
+/*! exports provided: WMFJSError, loggingEnabled, Helper */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -525,13 +1539,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-// tslint:disable-next-line:variable-name
-var WMFJSError = function (message) {
-    this.name = "WMFJSError";
-    this.message = message;
-    this.stack = (new Error()).stack;
-};
-WMFJSError.prototype = new Error();
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var WMFJSError = /** @class */ (function (_super) {
+    __extends(WMFJSError, _super);
+    function WMFJSError(message) {
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, message) || this;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain
+        return _this;
+    }
+    return WMFJSError;
+}(Error));
+
 var isLoggingEnabled = true;
 function loggingEnabled(enabled) {
     isLoggingEnabled = enabled;
@@ -541,7 +1569,6 @@ var Helper = /** @class */ (function () {
     }
     Helper.log = function (message) {
         if (isLoggingEnabled) {
-            // tslint:disable-next-line:no-console
             console.log(message);
         }
     };
@@ -799,708 +1826,12 @@ var Helper = /** @class */ (function () {
 
 
 /***/ }),
-/* 39 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GDIContextState", function() { return GDIContextState; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GDIContext", function() { return GDIContext; });
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
-/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(40);
-/* harmony import */ var _Region__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(41);
-/* harmony import */ var _Style__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(42);
-/*
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Thomas Bluemel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
-
-
-
-
-var GDIContextState = /** @class */ (function () {
-    function GDIContextState(copy, defObjects) {
-        if (copy != null) {
-            this._svggroup = copy._svggroup;
-            this._svgclipChanged = copy._svgclipChanged;
-            this._svgtextbkfilter = copy._svgtextbkfilter;
-            this.mapmode = copy.mapmode;
-            this.stretchmode = copy.stretchmode;
-            this.textalign = copy.textalign;
-            this.bkmode = copy.bkmode;
-            this.textcolor = copy.textcolor.clone();
-            this.bkcolor = copy.bkcolor.clone();
-            this.polyfillmode = copy.polyfillmode;
-            this.wx = copy.wx;
-            this.wy = copy.wy;
-            this.ww = copy.ww;
-            this.wh = copy.wh;
-            this.vx = copy.vx;
-            this.vy = copy.vy;
-            this.vw = copy.vw;
-            this.vh = copy.vh;
-            this.x = copy.x;
-            this.y = copy.y;
-            this.clip = copy.clip;
-            this.ownclip = false;
-            this.selected = {};
-            for (var type in copy.selected) {
-                this.selected[type] = copy.selected[type];
-            }
-        }
-        else {
-            this._svggroup = null;
-            this._svgclipChanged = false;
-            this._svgtextbkfilter = null;
-            this.mapmode = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.MapMode.MM_ANISOTROPIC;
-            this.stretchmode = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.StretchMode.COLORONCOLOR;
-            this.textalign = 0; // TA_LEFT | TA_TOP | TA_NOUPDATECP
-            this.bkmode = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.MixMode.OPAQUE;
-            this.textcolor = new _Style__WEBPACK_IMPORTED_MODULE_4__["ColorRef"](null, 0, 0, 0);
-            this.bkcolor = new _Style__WEBPACK_IMPORTED_MODULE_4__["ColorRef"](null, 255, 255, 255);
-            this.polyfillmode = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PolyFillMode.ALTERNATE;
-            this.wx = 0;
-            this.wy = 0;
-            this.ww = 0;
-            this.wh = 0;
-            this.vx = 0;
-            this.vy = 0;
-            this.vw = 0;
-            this.vh = 0;
-            this.x = 0;
-            this.y = 0;
-            this.clip = null;
-            this.ownclip = false;
-            this.selected = {};
-            for (var type in defObjects) {
-                var defObj = defObjects[type];
-                this.selected[type] = defObj != null ? defObj.clone() : null;
-            }
-        }
-    }
-    return GDIContextState;
-}());
-
-var GDIContext = /** @class */ (function () {
-    function GDIContext(svg) {
-        this._svg = svg;
-        this._svgdefs = null;
-        this._svgPatterns = {};
-        this._svgClipPaths = {};
-        this.defObjects = {
-            brush: new _Style__WEBPACK_IMPORTED_MODULE_4__["Brush"](null, null),
-            pen: new _Style__WEBPACK_IMPORTED_MODULE_4__["Pen"](null, _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_SOLID, new _Primitives__WEBPACK_IMPORTED_MODULE_2__["PointS"](null, 1, 1), new _Style__WEBPACK_IMPORTED_MODULE_4__["ColorRef"](null, 0, 0, 0), 0, 0),
-            font: new _Style__WEBPACK_IMPORTED_MODULE_4__["Font"](null, null),
-            palette: null,
-            region: null,
-        };
-        this.state = new GDIContextState(null, this.defObjects);
-        this.statestack = [this.state];
-        this.objects = {};
-    }
-    GDIContext.prototype.setMapMode = function (mode) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setMapMode: mode=" + mode);
-        this.state.mapmode = mode;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.setWindowOrg = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setWindowOrg: x=" + x + " y=" + y);
-        this.state.wx = x;
-        this.state.wy = y;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.setWindowExt = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setWindowExt: x=" + x + " y=" + y);
-        this.state.ww = x;
-        this.state.wh = y;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.offsetWindowOrg = function (offX, offY) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] offsetWindowOrg: offX=" + offX + " offY=" + offY);
-        this.state.wx += offX;
-        this.state.wy += offY;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.setViewportOrg = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setViewportOrg: x=" + x + " y=" + y);
-        this.state.vx = x;
-        this.state.vy = y;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.setViewportExt = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setViewportExt: x=" + x + " y=" + y);
-        this.state.vw = x;
-        this.state.vh = y;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.offsetViewportOrg = function (offX, offY) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] offsetViewportOrg: offX=" + offX + " offY=" + offY);
-        this.state.vx += offX;
-        this.state.vy += offY;
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.saveDC = function () {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] saveDC");
-        var prevstate = this.state;
-        this.state = new GDIContextState(this.state);
-        this.statestack.push(prevstate);
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.restoreDC = function (saved) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] restoreDC: saved=" + saved);
-        if (this.statestack.length > 1) {
-            if (saved === -1) {
-                this.state = this.statestack.pop();
-            }
-            else if (saved < -1) {
-                throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["WMFJSError"]("restoreDC: relative restore not implemented");
-            }
-            else if (saved > 1) {
-                throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["WMFJSError"]("restoreDC: absolute restore not implemented");
-            }
-        }
-        else {
-            throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["WMFJSError"]("No saved contexts");
-        }
-        this.state._svggroup = null;
-    };
-    GDIContext.prototype.escape = function (func, blob, offset, count) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] escape: func=" + func + " offset=" + offset + " count=" + count);
-    };
-    GDIContext.prototype.setStretchBltMode = function (stretchMode) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setStretchBltMode: stretchMode=" + stretchMode);
-    };
-    GDIContext.prototype.stretchDib = function (srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH, rasterOp, colorUsage, dib) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] stretchDib: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
-            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
-            + " rasterOp=0x" + rasterOp.toString(16));
-        srcX = this._todevX(srcX);
-        srcY = this._todevY(srcY);
-        srcW = this._todevW(srcW);
-        srcH = this._todevH(srcH);
-        dstX = this._todevX(dstX);
-        dstY = this._todevY(dstY);
-        dstW = this._todevW(dstW);
-        dstH = this._todevH(dstH);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] stretchDib: TRANSLATED: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
-            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
-            + " rasterOp=0x" + rasterOp.toString(16) + " colorUsage=0x" + colorUsage.toString(16));
-        this._pushGroup();
-        this._svg.image(this.state._svggroup, dstX, dstY, dstW, dstH, dib.base64ref());
-    };
-    GDIContext.prototype.stretchDibBits = function (srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH, rasterOp, dib) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] stretchDibBits: srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
-            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
-            + " rasterOp=0x" + rasterOp.toString(16));
-        srcX = this._todevX(srcX);
-        srcY = this._todevY(srcY);
-        srcW = this._todevW(srcW);
-        srcH = this._todevH(srcH);
-        dstX = this._todevX(dstX);
-        dstY = this._todevY(dstY);
-        dstW = this._todevW(dstW);
-        dstH = this._todevH(dstH);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] stretchDibBits: TRANSLATED:"
-            + " srcX=" + srcX + " srcY=" + srcY + " srcW=" + srcW + " srcH=" + srcH
-            + " dstX=" + dstX + " dstY=" + dstY + " dstW=" + dstW + " dstH=" + dstH
-            + " rasterOp=0x" + rasterOp.toString(16));
-        this._pushGroup();
-        this._svg.image(this.state._svggroup, dstX, dstY, dstW, dstH, dib.base64ref());
-    };
-    GDIContext.prototype.rectangle = function (rect, rw, rh) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] rectangle: rect=" + rect.toString() + " with pen " + this.state.selected.pen.toString()
-            + " and brush " + this.state.selected.brush.toString());
-        var bottom = this._todevY(rect.bottom);
-        var right = this._todevX(rect.right);
-        var top = this._todevY(rect.top);
-        var left = this._todevX(rect.left);
-        rw = this._todevH(rw);
-        rh = this._todevH(rh);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] rectangle: TRANSLATED: bottom=" + bottom + " right=" + right + " top=" + top
-            + " left=" + left + " rh=" + rh + " rw=" + rw);
-        this._pushGroup();
-        var opts = this._applyOpts(null, true, true, false);
-        this._svg.rect(this.state._svggroup, left, top, right - left, bottom - top, rw / 2, rh / 2, opts);
-    };
-    GDIContext.prototype.textOut = function (x, y, text) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] textOut: x=" + x + " y=" + y + " text=" + text
-            + " with font " + this.state.selected.font.toString());
-        x = this._todevX(x);
-        y = this._todevY(y);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] textOut: TRANSLATED: x=" + x + " y=" + y);
-        this._pushGroup();
-        var opts = this._applyOpts(null, false, false, true);
-        if (this.state.selected.font.escapement !== 0) {
-            opts.transform = "rotate(" + [(-this.state.selected.font.escapement / 10), x, y] + ")";
-            opts.style = "dominant-baseline: middle; text-anchor: start;";
-        }
-        if (this.state.bkmode === _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.MixMode.OPAQUE) {
-            if (this.state._svgtextbkfilter == null) {
-                var filterId = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"]._makeUniqueId("f");
-                var filter = this._svg.filter(this._getSvgDef(), filterId, 0, 0, 1, 1);
-                this._svg.filters.flood(filter, null, "#" + this.state.bkcolor.toHex(), 1.0);
-                this._svg.filters.composite(filter, null, null, "SourceGraphic");
-                this.state._svgtextbkfilter = filter;
-            }
-            opts.filter = "url(#" + jquery__WEBPACK_IMPORTED_MODULE_0__(this.state._svgtextbkfilter).attr("id") + ")";
-        }
-        this._svg.text(this.state._svggroup, x, y, text, opts);
-    };
-    GDIContext.prototype.extTextOut = function (x, y, text, fwOpts, rect, dx) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] extTextOut: x=" + x + " y=" + y + " text=" + text
-            + " with font " + this.state.selected.font.toString());
-        x = this._todevX(x);
-        y = this._todevY(y);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] extTextOut: TRANSLATED: x=" + x + " y=" + y);
-        this._pushGroup();
-        var opts = this._applyOpts(null, false, false, true);
-        if (this.state.selected.font.escapement !== 0) {
-            opts.transform = "rotate(" + [(-this.state.selected.font.escapement / 10), x, y] + ")";
-            opts.style = "dominant-baseline: middle; text-anchor: start;";
-        }
-        if (this.state.bkmode === _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.MixMode.OPAQUE) {
-            if (this.state._svgtextbkfilter == null) {
-                var filterId = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"]._makeUniqueId("f");
-                var filter = this._svg.filter(this._getSvgDef(), filterId, 0, 0, 1, 1);
-                this._svg.filters.flood(filter, null, "#" + this.state.bkcolor.toHex(), 1.0);
-                this._svg.filters.composite(filter, null, null, "SourceGraphic");
-                this.state._svgtextbkfilter = filter;
-            }
-            opts.filter = "url(#" + jquery__WEBPACK_IMPORTED_MODULE_0__(this.state._svgtextbkfilter).attr("id") + ")";
-        }
-        this._svg.text(this.state._svggroup, x, y, text, opts);
-    };
-    GDIContext.prototype.lineTo = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] lineTo: x=" + x + " y=" + y + " with pen " + this.state.selected.pen.toString());
-        var toX = this._todevX(x);
-        var toY = this._todevY(y);
-        var fromX = this._todevX(this.state.x);
-        var fromY = this._todevY(this.state.y);
-        // Update position
-        this.state.x = x;
-        this.state.y = y;
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] lineTo: TRANSLATED: toX=" + toX + " toY=" + toY + " fromX=" + fromX + " fromY=" + fromY);
-        this._pushGroup();
-        var opts = this._applyOpts(null, true, false, false);
-        this._svg.line(this.state._svggroup, fromX, fromY, toX, toY, opts);
-    };
-    GDIContext.prototype.moveTo = function (x, y) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] moveTo: x=" + x + " y=" + y);
-        this.state.x = x;
-        this.state.y = y;
-    };
-    GDIContext.prototype.polygon = function (points, first) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] polygon: points=" + points + " with pen " + this.state.selected.pen.toString()
-            + " and brush " + this.state.selected.brush.toString());
-        var pts = [];
-        for (var i = 0; i < points.length; i++) {
-            var point = points[i];
-            pts.push([this._todevX(point.x), this._todevY(point.y)]);
-        }
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] polygon: TRANSLATED: pts=" + pts);
-        if (first) {
-            this._pushGroup();
-        }
-        var opts = {
-            "fill-rule": this.state.polyfillmode === _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PolyFillMode.ALTERNATE ? "evenodd" : "nonzero",
-        };
-        this._applyOpts(opts, true, true, false);
-        this._svg.polygon(this.state._svggroup, pts, opts);
-    };
-    GDIContext.prototype.polyPolygon = function (polygons) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] polyPolygon: polygons.length=" + polygons.length
-            + " with pen " + this.state.selected.pen.toString()
-            + " and brush " + this.state.selected.brush.toString());
-        var cnt = polygons.length;
-        for (var i = 0; i < cnt; i++) {
-            this.polygon(polygons[i], i === 0);
-        }
-    };
-    GDIContext.prototype.polyline = function (points) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] polyline: points=" + points + " with pen " + this.state.selected.pen.toString());
-        var pts = [];
-        for (var i = 0; i < points.length; i++) {
-            var point = points[i];
-            pts.push([this._todevX(point.x), this._todevY(point.y)]);
-        }
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] polyline: TRANSLATED: pts=" + pts);
-        this._pushGroup();
-        var opts = this._applyOpts({ fill: "none" }, true, false, false);
-        this._svg.polyline(this.state._svggroup, pts, opts);
-    };
-    GDIContext.prototype.ellipse = function (rect) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] ellipse: rect=" + rect.toString() + " with pen " + this.state.selected.pen.toString()
-            + " and brush " + this.state.selected.brush.toString());
-        var bottom = this._todevY(rect.bottom);
-        var right = this._todevX(rect.right);
-        var top = this._todevY(rect.top);
-        var left = this._todevX(rect.left);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] ellipse: TRANSLATED: bottom=" + bottom + " right=" + right + " top=" + top + " left=" + left);
-        this._pushGroup();
-        var width2 = (right - left) / 2;
-        var height2 = (bottom - top) / 2;
-        var opts = this._applyOpts(null, true, true, false);
-        this._svg.ellipse(this.state._svggroup, left + width2, top + height2, width2, height2, opts);
-    };
-    GDIContext.prototype.excludeClipRect = function (rect) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] excludeClipRect: rect=" + rect.toString());
-        this._getClipRgn().subtract(rect);
-    };
-    GDIContext.prototype.intersectClipRect = function (rect) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] intersectClipRect: rect=" + rect.toString());
-        this._getClipRgn().intersect(rect);
-    };
-    GDIContext.prototype.offsetClipRgn = function (offX, offY) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] offsetClipRgn: offX=" + offX + " offY=" + offY);
-        this._getClipRgn().offset(offX, offY);
-    };
-    GDIContext.prototype.setTextAlign = function (textAlignmentMode) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setTextAlign: textAlignmentMode=0x" + textAlignmentMode.toString(16));
-        this.state.textalign = textAlignmentMode;
-    };
-    GDIContext.prototype.setBkMode = function (bkMode) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setBkMode: bkMode=0x" + bkMode.toString(16));
-        this.state.bkmode = bkMode;
-    };
-    GDIContext.prototype.setTextColor = function (textColor) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setTextColor: textColor=" + textColor.toString());
-        this.state.textcolor = textColor;
-    };
-    GDIContext.prototype.setBkColor = function (bkColor) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setBkColor: bkColor=" + bkColor.toString());
-        this.state.bkcolor = bkColor;
-        this.state._svgtextbkfilter = null;
-    };
-    GDIContext.prototype.setPolyFillMode = function (polyFillMode) {
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] setPolyFillMode: polyFillMode=" + polyFillMode);
-        this.state.polyfillmode = polyFillMode;
-    };
-    GDIContext.prototype.createBrush = function (brush) {
-        var idx = this._storeObject(brush);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createBrush: brush=" + brush.toString() + " with handle " + idx);
-    };
-    GDIContext.prototype.createFont = function (font) {
-        var idx = this._storeObject(font);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createFont: font=" + font.toString() + " with handle " + idx);
-    };
-    GDIContext.prototype.createPen = function (pen) {
-        var idx = this._storeObject(pen);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createPen: pen=" + pen.toString() + " width handle " + idx);
-    };
-    GDIContext.prototype.createPalette = function (palette) {
-        var idx = this._storeObject(palette);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createPalette: palette=" + palette.toString() + " width handle " + idx);
-    };
-    GDIContext.prototype.createRegion = function (region) {
-        var idx = this._storeObject(region);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createRegion: region=" + region.toString() + " width handle " + idx);
-    };
-    GDIContext.prototype.createPatternBrush = function (patternBrush) {
-        var idx = this._storeObject(patternBrush);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] createRegion: region=" + patternBrush.toString() + " width handle " + idx);
-    };
-    GDIContext.prototype.selectObject = function (objIdx, checkType) {
-        var obj = this._getObject(objIdx);
-        if (obj != null && (checkType == null || obj.type === checkType)) {
-            this._selectObject(obj);
-            _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] selectObject: objIdx=" + objIdx
-                + (obj ? " selected " + obj.type + ": " + obj.toString() : "[invalid index]"));
-        }
-        else {
-            _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] selectObject: objIdx=" + objIdx
-                + (obj ? " invalid object type: " + obj.type : "[invalid index]"));
-        }
-    };
-    GDIContext.prototype.deleteObject = function (objIdx) {
-        var ret = this._deleteObject(objIdx);
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] deleteObject: objIdx=" + objIdx + (ret ? " deleted object" : "[invalid index]"));
-    };
-    GDIContext.prototype._pushGroup = function () {
-        if (this.state._svggroup == null || this.state._svgclipChanged) {
-            this.state._svgclipChanged = false;
-            this.state._svgtextbkfilter = null;
-            var settings = {
-                viewBox: [this.state.vx, this.state.vy, this.state.vw, this.state.vh].join(" "),
-                preserveAspectRatio: "none",
-            };
-            if (this.state.clip != null) {
-                _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] new svg x=" + this.state.vx + " y=" + this.state.vy
-                    + " width=" + this.state.vw + " height=" + this.state.vh + " with clipping");
-                settings["clip-path"] = "url(#" + this._getSvgClipPathForRegion(this.state.clip) + ")";
-            }
-            else {
-                _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] new svg x=" + this.state.vx + " y=" + this.state.vy
-                    + " width=" + this.state.vw + " height=" + this.state.vh + " without clipping");
-            }
-            this.state._svggroup = this._svg.svg(this.state._svggroup, this.state.vx, this.state.vy, this.state.vw, this.state.vh, settings);
-        }
-    };
-    GDIContext.prototype._storeObject = function (obj) {
-        var i = 0;
-        while (this.objects[i.toString()] != null && i <= 65535) {
-            i++;
-        }
-        if (i > 65535) {
-            _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] Too many objects!");
-            return -1;
-        }
-        this.objects[i.toString()] = obj;
-        return i;
-    };
-    GDIContext.prototype._getObject = function (objIdx) {
-        var obj = this.objects[objIdx.toString()];
-        if (obj == null) {
-            _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] No object with handle " + objIdx);
-        }
-        return obj;
-    };
-    GDIContext.prototype._getSvgDef = function () {
-        if (this._svgdefs == null) {
-            this._svgdefs = this._svg.defs();
-        }
-        return this._svgdefs;
-    };
-    GDIContext.prototype._getSvgClipPathForRegion = function (region) {
-        for (var existingId in this._svgClipPaths) {
-            var rgn = this._svgClipPaths[existingId];
-            if (rgn === region) {
-                return existingId;
-            }
-        }
-        var id = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"]._makeUniqueId("c");
-        var sclip = this._svg.clipPath(this._getSvgDef(), id, "userSpaceOnUse");
-        switch (region.complexity) {
-            case 1:
-                this._svg.rect(sclip, this._todevX(region.bounds.left), this._todevY(region.bounds.top), this._todevW(region.bounds.right - region.bounds.left), this._todevH(region.bounds.bottom - region.bounds.top), { fill: "black", strokeWidth: 0 });
-                break;
-            case 2:
-                for (var i = 0; i < region.scans.length; i++) {
-                    var scan = region.scans[i];
-                    for (var j = 0; j < scan.scanlines.length; j++) {
-                        var scanline = scan.scanlines[j];
-                        this._svg.rect(sclip, this._todevX(scanline.left), this._todevY(scan.top), this._todevW(scanline.right - scanline.left), this._todevH(scan.bottom - scan.top), { fill: "black", strokeWidth: 0 });
-                    }
-                }
-                break;
-        }
-        this._svgClipPaths[id] = region;
-        return id;
-    };
-    GDIContext.prototype._getSvgPatternForBrush = function (brush) {
-        for (var existingId in this._svgPatterns) {
-            var pat = this._svgPatterns[existingId];
-            if (pat === brush) {
-                return existingId;
-            }
-        }
-        var width;
-        var height;
-        var img;
-        switch (brush.style) {
-            case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_PATTERN:
-                width = brush.pattern.getWidth();
-                height = brush.pattern.getHeight();
-                break;
-            case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_DIBPATTERNPT:
-                width = brush.dibpatternpt.getWidth();
-                height = brush.dibpatternpt.getHeight();
-                img = brush.dibpatternpt.base64ref();
-                break;
-            default:
-                throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["WMFJSError"]("Invalid brush style");
-        }
-        var id = _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"]._makeUniqueId("p");
-        var spat = this._svg.pattern(this._getSvgDef(), id, 0, 0, width, height, { patternUnits: "userSpaceOnUse" });
-        this._svg.image(spat, 0, 0, width, height, img);
-        this._svgPatterns[id] = brush;
-        return id;
-    };
-    GDIContext.prototype._selectObject = function (obj) {
-        this.state.selected[obj.type] = obj;
-        if (obj.type === "region") {
-            this.state._svgclipChanged = true;
-        }
-    };
-    GDIContext.prototype._deleteObject = function (objIdx) {
-        var obj = this.objects[objIdx.toString()];
-        if (obj != null) {
-            for (var i = 0; i < this.statestack.length; i++) {
-                var state = this.statestack[i];
-                if (state.selected[obj.type] === obj) {
-                    state.selected[obj.type] = this.defObjects[obj.type].clone();
-                }
-            }
-            delete this.objects[objIdx.toString()];
-            return true;
-        }
-        _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] Cannot delete object with invalid handle " + objIdx);
-        return false;
-    };
-    GDIContext.prototype._getClipRgn = function () {
-        if (this.state.clip != null) {
-            if (!this.state.ownclip) {
-                this.state.clip = this.state.clip.clone();
-            }
-        }
-        else {
-            if (this.state.selected.region != null) {
-                this.state.clip = this.state.selected.region.clone();
-            }
-            else {
-                this.state.clip = Object(_Region__WEBPACK_IMPORTED_MODULE_3__["CreateSimpleRegion"])(this.state.wx, this.state.wy, this.state.wx + this.state.ww, this.state.wy + this.state.wh);
-            }
-        }
-        this.state.ownclip = true;
-        return this.state.clip;
-    };
-    GDIContext.prototype._todevX = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor((val - this.state.wx) * (this.state.vw / this.state.ww)) + this.state.vx;
-    };
-    GDIContext.prototype._todevY = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor((val - this.state.wy) * (this.state.vh / this.state.wh)) + this.state.vy;
-    };
-    GDIContext.prototype._todevW = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor(val * (this.state.vw / this.state.ww)) + this.state.vx;
-    };
-    GDIContext.prototype._todevH = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor(val * (this.state.vh / this.state.wh)) + this.state.vy;
-    };
-    GDIContext.prototype._tologicalX = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor((val - this.state.vx) / (this.state.vw / this.state.ww)) + this.state.wx;
-    };
-    GDIContext.prototype._tologicalY = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor((val - this.state.vy) / (this.state.vh / this.state.wh)) + this.state.wy;
-    };
-    GDIContext.prototype._tologicalW = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor(val / (this.state.vw / this.state.ww)) + this.state.wx;
-    };
-    GDIContext.prototype._tologicalH = function (val) {
-        // http://wvware.sourceforge.net/caolan/mapmode.html
-        // logical -> device
-        return Math.floor(val / (this.state.vh / this.state.wh)) + this.state.wy;
-    };
-    GDIContext.prototype._applyOpts = function (opts, usePen, useBrush, useFont) {
-        if (opts == null) {
-            opts = {};
-        }
-        if (usePen) {
-            var pen = this.state.selected.pen;
-            if (pen.style !== _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_NULL) {
-                opts.stroke = "#" + pen.color.toHex(), // TODO: pen style
-                    opts.strokeWidth = this._todevW(pen.width.x); // TODO: is .y ever used?
-                var dotWidth = void 0;
-                if ((pen.linecap & _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_ENDCAP_SQUARE) !== 0) {
-                    opts["stroke-linecap"] = "square";
-                    dotWidth = 1;
-                }
-                else if ((pen.linecap & _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_ENDCAP_FLAT) !== 0) {
-                    opts["stroke-linecap"] = "butt";
-                    dotWidth = opts.strokeWidth;
-                }
-                else {
-                    opts["stroke-linecap"] = "round";
-                    dotWidth = 1;
-                }
-                if ((pen.join & _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_JOIN_BEVEL) !== 0) {
-                    opts["stroke-linejoin"] = "bevel";
-                }
-                else if ((pen.join & _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_JOIN_MITER) !== 0) {
-                    opts["stroke-linejoin"] = "miter";
-                }
-                else {
-                    opts["stroke-linejoin"] = "round";
-                }
-                var dashWidth = opts.strokeWidth * 4;
-                var dotSpacing = opts.strokeWidth * 2;
-                switch (pen.style) {
-                    case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_DASH:
-                        opts["stroke-dasharray"] = [dashWidth, dotSpacing].toString();
-                        break;
-                    case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_DOT:
-                        opts["stroke-dasharray"] = [dotWidth, dotSpacing].toString();
-                        break;
-                    case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_DASHDOT:
-                        opts["stroke-dasharray"] = [dashWidth, dotSpacing, dotWidth, dotSpacing].toString();
-                        break;
-                    case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.PenStyle.PS_DASHDOTDOT:
-                        opts["stroke-dasharray"]
-                            = [dashWidth, dotSpacing, dotWidth, dotSpacing, dotWidth, dotSpacing].toString();
-                        break;
-                }
-            }
-        }
-        if (useBrush) {
-            var brush = this.state.selected.brush;
-            switch (brush.style) {
-                case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_SOLID:
-                    opts.fill = "#" + brush.color.toHex();
-                    break;
-                case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_PATTERN:
-                case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_DIBPATTERNPT:
-                    opts.fill = "url(#" + this._getSvgPatternForBrush(brush) + ")";
-                    break;
-                case _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].GDI.BrushStyle.BS_NULL:
-                    opts.fill = "none";
-                    break;
-                default:
-                    _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[gdi] unsupported brush style: " + brush.style);
-                    opts.fill = "none";
-                    break;
-            }
-        }
-        if (useFont) {
-            var font = this.state.selected.font;
-            opts["font-family"] = font.facename;
-            opts["font-size"] = this._todevH(Math.abs(font.height));
-            opts.fill = "#" + this.state.textcolor.toHex();
-        }
-        return opts;
-    };
-    return GDIContext;
-}());
-
-
-
-/***/ }),
-/* 40 */
+/***/ "./src/wmfjs/Primitives.ts":
+/*!*********************************!*\
+  !*** ./src/wmfjs/Primitives.ts ***!
+  \*********************************/
+/*! exports provided: PointS, Rect, Obj */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1508,7 +1839,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PointS", function() { return PointS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Rect", function() { return Rect; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Obj", function() { return Obj; });
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(38);
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
 /*
 
 The MIT License (MIT)
@@ -1609,7 +1940,12 @@ var Obj = /** @class */ (function () {
 
 
 /***/ }),
-/* 41 */
+
+/***/ "./src/wmfjs/Region.ts":
+/*!*****************************!*\
+  !*** ./src/wmfjs/Region.ts ***!
+  \*****************************/
+/*! exports provided: Region, CreateSimpleRegion, Scan */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1617,8 +1953,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Region", function() { return Region; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CreateSimpleRegion", function() { return CreateSimpleRegion; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scan", function() { return Scan; });
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(38);
-/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(40);
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Primitives */ "./src/wmfjs/Primitives.ts");
 /*
 
 The MIT License (MIT)
@@ -2062,7 +2398,160 @@ var Scan = /** @class */ (function () {
 
 
 /***/ }),
-/* 42 */
+
+/***/ "./src/wmfjs/Renderer.ts":
+/*!*******************************!*\
+  !*** ./src/wmfjs/Renderer.ts ***!
+  \*******************************/
+/*! exports provided: Renderer */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Renderer", function() { return Renderer; });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util */ "./src/util/index.ts");
+/* harmony import */ var _Blob__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Blob */ "./src/wmfjs/Blob.ts");
+/* harmony import */ var _GDIContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./GDIContext */ "./src/wmfjs/GDIContext.ts");
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony import */ var _WMFRecords__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./WMFRecords */ "./src/wmfjs/WMFRecords.ts");
+/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Thomas Bluemel
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+
+
+
+
+var Renderer = /** @class */ (function () {
+    function Renderer(blob) {
+        this.parse(blob);
+        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("WMFJS.Renderer instantiated");
+    }
+    Renderer.prototype.render = function (info) {
+        var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        this._render(new _util__WEBPACK_IMPORTED_MODULE_0__["SVG"](svgElement), info.mapMode, info.xExt, info.yExt);
+        svgElement.setAttribute("viewBox", [0, 0, info.xExt, info.yExt].join(" "));
+        svgElement.setAttribute("preserveAspectRatio", "none"); // TODO: MM_ISOTROPIC vs MM_ANISOTROPIC
+        svgElement.setAttribute("width", info.width);
+        svgElement.setAttribute("height", info.height);
+        return svgElement;
+    };
+    Renderer.prototype.parse = function (blob) {
+        this._img = null;
+        var reader = new _Blob__WEBPACK_IMPORTED_MODULE_1__["Blob"](blob);
+        var type;
+        var size;
+        var placable;
+        var headerstart;
+        var key = reader.readUint32();
+        if (key === 0x9ac6cdd7) {
+            placable = new WMFPlacable(reader);
+            headerstart = reader.pos;
+            type = reader.readUint16();
+            size = reader.readUint16();
+        }
+        else {
+            headerstart = 0;
+            type = key & 0xffff;
+            size = (key >>> 16) & 0xffff;
+        }
+        switch (type) {
+            case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileType.MEMORYMETAFILE:
+            case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileType.DISKMETAFILE:
+                if (size === _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.METAHEADER_SIZE / 2) {
+                    var version = reader.readUint16();
+                    switch (version) {
+                        case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileVersion.METAVERSION100:
+                        case _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].GDI.MetafileVersion.METAVERSION300:
+                            this._img = new WMF(reader, placable, version, headerstart + (size * 2));
+                            break;
+                    }
+                }
+                break;
+        }
+        if (this._img == null) {
+            throw new _Helper__WEBPACK_IMPORTED_MODULE_3__["WMFJSError"]("Format not recognized");
+        }
+    };
+    Renderer.prototype._render = function (svg, mapMode, xExt, yExt) {
+        // See https://www-user.tu-chemnitz.de/~ygu/petzold/ch18b.htm
+        var gdi = new _GDIContext__WEBPACK_IMPORTED_MODULE_2__["GDIContext"](svg);
+        gdi.setViewportExt(xExt, yExt);
+        gdi.setMapMode(mapMode);
+        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("[WMF] BEGIN RENDERING --->");
+        this._img.render(gdi);
+        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("[WMF] <--- DONE RENDERING");
+    };
+    return Renderer;
+}());
+
+var WMFRect16 = /** @class */ (function () {
+    function WMFRect16(reader) {
+        this.left = reader.readInt16();
+        this.top = reader.readInt16();
+        this.right = reader.readInt16();
+        this.bottom = reader.readInt16();
+    }
+    WMFRect16.prototype.toString = function () {
+        return "{left: " + this.left + ", top: " + this.top + ", right: " + this.right
+            + ", bottom: " + this.bottom + "}";
+    };
+    return WMFRect16;
+}());
+var WMFPlacable = /** @class */ (function () {
+    function WMFPlacable(reader) {
+        reader.skip(2);
+        this.boundingBox = new WMFRect16(reader);
+        this.unitsPerInch = reader.readInt16();
+        reader.skip(4);
+        reader.skip(2); // TODO: checksum
+        _Helper__WEBPACK_IMPORTED_MODULE_3__["Helper"].log("Got bounding box " + this.boundingBox + " and " + this.unitsPerInch + " units/inch");
+    }
+    return WMFPlacable;
+}());
+var WMF = /** @class */ (function () {
+    function WMF(reader, placable, version, hdrsize) {
+        this._version = version;
+        this._hdrsize = hdrsize;
+        this._placable = placable;
+        this._records = new _WMFRecords__WEBPACK_IMPORTED_MODULE_4__["WMFRecords"](reader, this._hdrsize);
+    }
+    WMF.prototype.render = function (gdi) {
+        this._records.play(gdi);
+    };
+    return WMF;
+}());
+
+
+/***/ }),
+
+/***/ "./src/wmfjs/Style.ts":
+/*!****************************!*\
+  !*** ./src/wmfjs/Style.ts ***!
+  \****************************/
+/*! exports provided: ColorRef, Font, Brush, Pen, PaletteEntry, Palette */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2073,9 +2562,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Pen", function() { return Pen; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PaletteEntry", function() { return PaletteEntry; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Palette", function() { return Palette; });
-/* harmony import */ var _Bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(43);
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
-/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(40);
+/* harmony import */ var _Bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Bitmap */ "./src/wmfjs/Bitmap.ts");
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Primitives */ "./src/wmfjs/Primitives.ts");
 /*
 
 The MIT License (MIT)
@@ -2355,6 +2844,7 @@ var Palette = /** @class */ (function (_super) {
             _this.entries = [];
             while (cnt > 0) {
                 _this.entries.push(new PaletteEntry(reader));
+                cnt--;
             }
         }
         else {
@@ -2379,287 +2869,23 @@ var Palette = /** @class */ (function (_super) {
 
 
 /***/ }),
-/* 43 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BitmapBase", function() { return BitmapBase; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BitmapCoreHeader", function() { return BitmapCoreHeader; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BitmapInfoHeader", function() { return BitmapInfoHeader; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BitmapInfo", function() { return BitmapInfo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DIBitmap", function() { return DIBitmap; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Bitmap16", function() { return Bitmap16; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PatternBitmap16", function() { return PatternBitmap16; });
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(38);
-/*
-
-The MIT License (MIT)
-
-Copyright (c) 2015 Thomas Bluemel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-var BitmapBase = /** @class */ (function () {
-    function BitmapBase() {
-    }
-    BitmapBase.prototype.getWidth = function () {
-        throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("getWidth not implemented");
-    };
-    BitmapBase.prototype.getHeight = function () {
-        throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("getHeight not implemented");
-    };
-    return BitmapBase;
-}());
-
-var BitmapCoreHeader = /** @class */ (function () {
-    function BitmapCoreHeader(reader, skipsize) {
-        if (skipsize) {
-            reader.skip(4);
-        }
-        this.width = reader.readUint16();
-        this.height = reader.readUint16();
-        this.planes = reader.readUint16();
-        this.bitcount = reader.readUint16();
-    }
-    BitmapCoreHeader.prototype.colors = function () {
-        return this.bitcount <= 8 ? 1 << this.bitcount : 0;
-    };
-    return BitmapCoreHeader;
-}());
-
-var BitmapInfoHeader = /** @class */ (function () {
-    function BitmapInfoHeader(reader, skipsize) {
-        if (skipsize) {
-            reader.skip(4);
-        }
-        this.width = reader.readInt32();
-        this.height = reader.readInt32();
-        this.planes = reader.readUint16();
-        this.bitcount = reader.readUint16();
-        this.compression = reader.readUint32();
-        this.sizeimage = reader.readUint32();
-        this.xpelspermeter = reader.readInt32();
-        this.ypelspermeter = reader.readInt32();
-        this.clrused = reader.readUint32();
-        this.clrimportant = reader.readUint32();
-    }
-    BitmapInfoHeader.prototype.colors = function () {
-        if (this.clrused !== 0) {
-            return this.clrused < 256 ? this.clrused : 256;
-        }
-        else {
-            return this.bitcount > 8 ? 0 : 1 << this.bitcount;
-        }
-    };
-    return BitmapInfoHeader;
-}());
-
-var BitmapInfo = /** @class */ (function (_super) {
-    __extends(BitmapInfo, _super);
-    function BitmapInfo(reader, usergb) {
-        var _this = _super.call(this) || this;
-        _this._reader = reader;
-        _this._offset = reader.pos;
-        _this._usergb = usergb;
-        var hdrsize = reader.readUint32();
-        _this._infosize = hdrsize;
-        if (hdrsize === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPCOREHEADER_SIZE) {
-            _this._header = new BitmapCoreHeader(reader, false);
-            _this._infosize += _this._header.colors() * (usergb ? 3 : 2);
-        }
-        else {
-            _this._header = new BitmapInfoHeader(reader, false);
-            var masks = _this._header.compression === _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_BITFIELDS ? 3 : 0;
-            if (hdrsize <= _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPINFOHEADER_SIZE + (masks * 4)) {
-                _this._infosize = _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BITMAPINFOHEADER_SIZE + (masks * 4);
-            }
-            _this._infosize += _this._header.colors() * (usergb ? 4 : 2);
-        }
-        return _this;
-    }
-    BitmapInfo.prototype.getWidth = function () {
-        return this._header.width;
-    };
-    BitmapInfo.prototype.getHeight = function () {
-        return Math.abs(this._header.height);
-    };
-    BitmapInfo.prototype.infosize = function () {
-        return this._infosize;
-    };
-    BitmapInfo.prototype.header = function () {
-        return this._header;
-    };
-    return BitmapInfo;
-}(BitmapBase));
-
-var DIBitmap = /** @class */ (function (_super) {
-    __extends(DIBitmap, _super);
-    function DIBitmap(reader, size) {
-        var _this = _super.call(this) || this;
-        _this._reader = reader;
-        _this._offset = reader.pos;
-        _this._size = size;
-        _this._info = new BitmapInfo(reader, true);
-        return _this;
-    }
-    DIBitmap.prototype.getWidth = function () {
-        return this._info.getWidth();
-    };
-    DIBitmap.prototype.getHeight = function () {
-        return this._info.getHeight();
-    };
-    DIBitmap.prototype.base64ref = function () {
-        var prevpos = this._reader.pos;
-        this._reader.seek(this._offset);
-        var mime = "image/bmp";
-        var header = this._info.header();
-        var data;
-        if (header instanceof BitmapInfoHeader && header.compression != null) {
-            switch (header.compression) {
-                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_JPEG:
-                    mime = "data:image/jpeg";
-                    break;
-                case _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].GDI.BitmapCompression.BI_PNG:
-                    mime = "data:image/png";
-                    break;
-                default:
-                    data = this.makeBitmapFileHeader();
-                    break;
-            }
-        }
-        else {
-            data = this.makeBitmapFileHeader();
-        }
-        if (data != null) {
-            data += this._reader.readBinary(this._size);
-        }
-        else {
-            data = this._reader.readBinary(this._size);
-        }
-        var ref = "data:" + mime + ";base64," + btoa(data);
-        this._reader.seek(prevpos);
-        return ref;
-    };
-    DIBitmap.prototype.makeBitmapFileHeader = function () {
-        var buf = new ArrayBuffer(14);
-        var view = new Uint8Array(buf);
-        view[0] = 0x42;
-        view[1] = 0x4d;
-        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._writeUint32Val(view, 2, this._size + 14);
-        _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._writeUint32Val(view, 10, this._info.infosize() + 14);
-        return _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._blobToBinary(view);
-    };
-    return DIBitmap;
-}(BitmapBase));
-
-var Bitmap16 = /** @class */ (function (_super) {
-    __extends(Bitmap16, _super);
-    function Bitmap16(reader, size) {
-        var _this = _super.call(this) || this;
-        if (reader != null) {
-            size = size;
-            _this._reader = reader;
-            _this._offset = reader.pos;
-            _this._size = size;
-            _this.type = reader.readInt16();
-            _this.width = reader.readInt16();
-            _this.height = reader.readInt16();
-            _this.widthBytes = reader.readInt16();
-            _this.planes = reader.readUint8();
-            _this.bitsPixel = reader.readUint8();
-            _this.bitsOffset = reader.pos;
-            _this.bitsSize = (((_this.width * _this.bitsPixel + 15) >> 4) << 1) * _this.height;
-            if (_this.bitsSize > size - 10) {
-                throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["WMFJSError"]("Bitmap should have " + _this.bitsSize + " bytes, but has " + (size - 10));
-            }
-        }
-        else {
-            var copy = size;
-            _this._reader = copy._reader;
-            _this._offset = copy._offset;
-            _this._size = copy._size;
-            _this.type = copy.type;
-            _this.width = copy.width;
-            _this.height = copy.height;
-            _this.widthBytes = copy.widthBytes;
-            _this.planes = copy.planes;
-            _this.bitsPixel = copy.bitsPixel;
-            _this.bitsOffset = copy.bitsOffset;
-            _this.bitsSize = copy.bitsSize;
-        }
-        return _this;
-    }
-    Bitmap16.prototype.getWidth = function () {
-        return this.width;
-    };
-    Bitmap16.prototype.getHeight = function () {
-        return this.height;
-    };
-    Bitmap16.prototype.clone = function () {
-        return new Bitmap16(null, this);
-    };
-    return Bitmap16;
-}(BitmapBase));
-
-var PatternBitmap16 = /** @class */ (function (_super) {
-    __extends(PatternBitmap16, _super);
-    function PatternBitmap16(reader, size) {
-        var _this = _super.call(this, reader, size) || this;
-        if (reader != null) {
-            _this.bitsOffset += 22; // skip bits (4 bytes) + reserved (18 bytes)
-        }
-        return _this;
-    }
-    PatternBitmap16.prototype.clone = function () {
-        return new PatternBitmap16(null, this);
-    };
-    return PatternBitmap16;
-}(Bitmap16));
-
-
-
-/***/ }),
-/* 44 */
+/***/ "./src/wmfjs/WMFRecords.ts":
+/*!*********************************!*\
+  !*** ./src/wmfjs/WMFRecords.ts ***!
+  \*********************************/
+/*! exports provided: WMFRecords */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WMFRecords", function() { return WMFRecords; });
-/* harmony import */ var _Bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(43);
-/* harmony import */ var _Blob__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(37);
-/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(38);
-/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(40);
-/* harmony import */ var _Region__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(41);
-/* harmony import */ var _Style__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(42);
+/* harmony import */ var _Bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Bitmap */ "./src/wmfjs/Bitmap.ts");
+/* harmony import */ var _Blob__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Blob */ "./src/wmfjs/Blob.ts");
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony import */ var _Primitives__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Primitives */ "./src/wmfjs/Primitives.ts");
+/* harmony import */ var _Region__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Region */ "./src/wmfjs/Region.ts");
+/* harmony import */ var _Style__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Style */ "./src/wmfjs/Style.ts");
 /*
 
 The MIT License (MIT)
@@ -2782,39 +3008,61 @@ var WMFRecords = /** @class */ (function () {
                     });
                     break;
                 }
-                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_DIBSTRETCHBLT: {
+                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_DIBBITBLT: {
                     var haveSrcDib = ((type >> 8) + 3 !== size);
                     var rasterOp_1 = reader.readUint16() | (reader.readUint16() << 16);
-                    var srcH_1 = reader.readInt16();
-                    var srcW_1 = reader.readInt16();
                     var srcY_1 = reader.readInt16();
                     var srcX_1 = reader.readInt16();
-                    var destH_1 = reader.readInt16();
-                    var destW_1 = reader.readInt16();
+                    if (!haveSrcDib) {
+                        // ignore reserved field
+                        reader.skip(2);
+                    }
+                    var height_1 = reader.readInt16();
+                    var width_1 = reader.readInt16();
                     var destY_1 = reader.readInt16();
                     var destX_1 = reader.readInt16();
-                    var datalength = size * 2 - (reader.pos - curpos);
-                    var dib_1 = new _Bitmap__WEBPACK_IMPORTED_MODULE_0__["DIBitmap"](reader, datalength);
-                    this_1._records.push(function (gdi) {
-                        gdi.stretchDibBits(srcX_1, srcY_1, srcW_1, srcH_1, destX_1, destY_1, destW_1, destH_1, rasterOp_1, dib_1);
-                    });
+                    if (haveSrcDib) {
+                        var datalength = size * 2 - (reader.pos - curpos);
+                        var dib_1 = new _Bitmap__WEBPACK_IMPORTED_MODULE_0__["DIBitmap"](reader, datalength);
+                        this_1._records.push(function (gdi) {
+                            gdi.dibBits(srcX_1, srcY_1, destX_1, destY_1, width_1, height_1, rasterOp_1, dib_1);
+                        });
+                    }
                     break;
                 }
-                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_STRETCHDIB: {
+                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_DIBSTRETCHBLT: {
+                    var haveSrcDib = ((type >> 8) + 3 !== size);
                     var rasterOp_2 = reader.readUint16() | (reader.readUint16() << 16);
-                    var colorUsage_1 = reader.readInt16();
-                    var srcH_2 = reader.readInt16();
-                    var srcW_2 = reader.readInt16();
+                    var srcH_1 = reader.readInt16();
+                    var srcW_1 = reader.readInt16();
                     var srcY_2 = reader.readInt16();
                     var srcX_2 = reader.readInt16();
-                    var destH_2 = reader.readInt16();
-                    var destW_2 = reader.readInt16();
+                    var destH_1 = reader.readInt16();
+                    var destW_1 = reader.readInt16();
                     var destY_2 = reader.readInt16();
                     var destX_2 = reader.readInt16();
                     var datalength = size * 2 - (reader.pos - curpos);
                     var dib_2 = new _Bitmap__WEBPACK_IMPORTED_MODULE_0__["DIBitmap"](reader, datalength);
                     this_1._records.push(function (gdi) {
-                        gdi.stretchDib(srcX_2, srcY_2, srcW_2, srcH_2, destX_2, destY_2, destW_2, destH_2, rasterOp_2, colorUsage_1, dib_2);
+                        gdi.stretchDibBits(srcX_2, srcY_2, srcW_1, srcH_1, destX_2, destY_2, destW_1, destH_1, rasterOp_2, dib_2);
+                    });
+                    break;
+                }
+                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_STRETCHDIB: {
+                    var rasterOp_3 = reader.readUint16() | (reader.readUint16() << 16);
+                    var colorUsage_1 = reader.readInt16();
+                    var srcH_2 = reader.readInt16();
+                    var srcW_2 = reader.readInt16();
+                    var srcY_3 = reader.readInt16();
+                    var srcX_3 = reader.readInt16();
+                    var destH_2 = reader.readInt16();
+                    var destW_2 = reader.readInt16();
+                    var destY_3 = reader.readInt16();
+                    var destX_3 = reader.readInt16();
+                    var datalength = size * 2 - (reader.pos - curpos);
+                    var dib_3 = new _Bitmap__WEBPACK_IMPORTED_MODULE_0__["DIBitmap"](reader, datalength);
+                    this_1._records.push(function (gdi) {
+                        gdi.stretchDib(srcX_3, srcY_3, srcW_2, srcH_2, destX_3, destY_3, destW_2, destH_2, rasterOp_3, colorUsage_1, dib_3);
                     });
                     break;
                 }
@@ -3128,7 +3376,6 @@ var WMFRecords = /** @class */ (function () {
                 case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_CHORD:
                 case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_BITBLT:
                 case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_SETDIBTODEV:
-                case _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType.META_DIBBITBLT:
                 default: {
                     var recordName = "UNKNOWN";
                     for (var name_1 in _Helper__WEBPACK_IMPORTED_MODULE_2__["Helper"].GDI.RecordType) {
@@ -3167,7 +3414,56 @@ var WMFRecords = /** @class */ (function () {
 
 
 
+/***/ }),
+
+/***/ "./src/wmfjs/index.ts":
+/*!****************************!*\
+  !*** ./src/wmfjs/index.ts ***!
+  \****************************/
+/*! exports provided: Renderer, Error, loggingEnabled */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Renderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Renderer */ "./src/wmfjs/Renderer.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Renderer", function() { return _Renderer__WEBPACK_IMPORTED_MODULE_0__["Renderer"]; });
+
+/* harmony import */ var _Helper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Helper */ "./src/wmfjs/Helper.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Error", function() { return _Helper__WEBPACK_IMPORTED_MODULE_1__["WMFJSError"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "loggingEnabled", function() { return _Helper__WEBPACK_IMPORTED_MODULE_1__["loggingEnabled"]; });
+
+/*
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Thomas Bluemel
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+
+
+
+
 /***/ })
-/******/ ]);
+
+/******/ });
 });
 //# sourceMappingURL=WMFJS.bundle.js.map

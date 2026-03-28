@@ -42,10 +42,9 @@ import { PictDestination, PictGroupDestinationFactory } from "./PictDestinations
 import { RtfDestination } from "./RtfDestination";
 import { StylesheetDestination } from "./StylesheetDestination";
 
-// tslint:disable-next-line:variable-name
 export const Destinations
     : {[key: string]
-        : ({ new (parser: GlobalState, inst: Document, name: string, param: number): any }
+        : ((new (parser: GlobalState, inst: Document, name: string, param: number) => any)
         | DestinationFactory<any>)} = {
     rtf: RtfDestination,
     info: InfoDestination,

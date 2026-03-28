@@ -27,17 +27,13 @@ SOFTWARE.
 import { Blob } from "./Blob";
 import { Helper, WMFJSError } from "./Helper";
 
-export class BitmapBase {
-    public getWidth() {
-        throw new WMFJSError("getWidth not implemented");
-    }
+interface Bitmap {
+    getWidth(): number
 
-    public getHeight() {
-        throw new WMFJSError("getHeight not implemented");
-    }
+    getHeight(): number
 }
 
-export class BitmapCoreHeader {
+class BitmapCoreHeader {
     public width: number;
     public height: number;
     public planes: number;
@@ -53,12 +49,12 @@ export class BitmapCoreHeader {
         this.bitcount = reader.readUint16();
     }
 
-    public colors() {
+    public colors(): number {
         return this.bitcount <= 8 ? 1 << this.bitcount : 0;
     }
 }
 
-export class BitmapInfoHeader {
+class BitmapInfoHeader {
     public width: number;
     public height: number;
     public planes: number;
@@ -86,7 +82,7 @@ export class BitmapInfoHeader {
         this.clrimportant = reader.readUint32();
     }
 
-    public colors() {
+    public colors(): number {
         if (this.clrused !== 0) {
             return this.clrused < 256 ? this.clrused : 256;
         } else {
@@ -95,7 +91,7 @@ export class BitmapInfoHeader {
     }
 }
 
-export class BitmapInfo extends BitmapBase {
+export class BitmapInfo implements Bitmap {
     private _reader: Blob;
     private _offset: number;
     private _usergb: boolean;
@@ -103,7 +99,6 @@ export class BitmapInfo extends BitmapBase {
     private _header: BitmapCoreHeader | BitmapInfoHeader;
 
     constructor(reader: Blob, usergb: boolean) {
-        super();
         this._reader = reader;
         this._offset = reader.pos;
         this._usergb = usergb;
@@ -123,52 +118,51 @@ export class BitmapInfo extends BitmapBase {
         }
     }
 
-    public getWidth() {
+    public getWidth(): number {
         return this._header.width;
     }
 
-    public getHeight() {
+    public getHeight(): number {
         return Math.abs(this._header.height);
     }
 
-    public infosize() {
+    public infosize(): number {
         return this._infosize;
     }
 
-    public header() {
+    public header(): BitmapCoreHeader | BitmapInfoHeader {
         return this._header;
     }
 }
 
-export class DIBitmap extends BitmapBase {
+export class DIBitmap implements Bitmap {
     private _reader: Blob;
     private _offset: number;
     private _size: number;
     private _info: BitmapInfo;
 
     constructor(reader: Blob, size: number) {
-        super();
         this._reader = reader;
         this._offset = reader.pos;
         this._size = size;
         this._info = new BitmapInfo(reader, true);
     }
 
-    public getWidth() {
+    public getWidth(): number {
         return this._info.getWidth();
     }
 
-    public getHeight() {
+    public getHeight(): number {
         return this._info.getHeight();
     }
 
-    public base64ref() {
+    public base64ref(): string {
         const prevpos = this._reader.pos;
         this._reader.seek(this._offset);
         let mime = "image/bmp";
         const header = this._info.header();
         let data;
-        if (header instanceof  BitmapInfoHeader && header.compression != null) {
+        if (header instanceof BitmapInfoHeader && header.compression != null) {
             switch (header.compression) {
                 case Helper.GDI.BitmapCompression.BI_JPEG:
                     mime = "data:image/jpeg";
@@ -206,7 +200,7 @@ export class DIBitmap extends BitmapBase {
     }
 }
 
-export class Bitmap16 extends BitmapBase {
+export class Bitmap16 implements Bitmap {
     public type: number;
     public width: number;
     public height: number;
@@ -220,7 +214,6 @@ export class Bitmap16 extends BitmapBase {
     private _size: number;
 
     constructor(reader: Blob, size: number | Bitmap16) {
-        super();
         if (reader != null) {
             size = size as number;
             this._reader = reader;
@@ -253,15 +246,15 @@ export class Bitmap16 extends BitmapBase {
         }
     }
 
-    public getWidth() {
+    public getWidth(): number {
         return this.width;
     }
 
-    public getHeight() {
+    public getHeight(): number {
         return this.height;
     }
 
-    public clone() {
+    public clone(): Bitmap16 {
         return new Bitmap16(null, this);
     }
 }

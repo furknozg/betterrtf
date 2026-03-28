@@ -61,6 +61,7 @@ export class PictDestination extends DestinationTextBase {
     private _blob: ArrayBuffer;
     private parser: GlobalState;
     private inst: Document;
+
     [key: string]: any;
 
     private _pictHandlers: { [key: string]: (param: number) => void } = {
@@ -70,8 +71,10 @@ export class PictDestination extends DestinationTextBase {
         pichgoal: this._setPropValueRequired("_displaysize", "height"),
     };
 
-    private _pictTypeHandler: { [key: string]
-            : string | ((param?: number) => { load: () => any, render: (img: any) => JQuery }) } = {
+    private _pictTypeHandler: {
+        [key: string]
+            : string | ((param?: number) => { load: () => any, render: (img: any) => Element })
+    } = {
         emfblip: (() => {
             if (typeof EMFJS !== "undefined") {
                 return () => {
@@ -92,7 +95,7 @@ export class PictDestination extends DestinationTextBase {
                                 width: Helper._twipsToPt(this._displaysize.width) + "pt",
                                 height: Helper._twipsToPt(this._displaysize.height) + "pt",
                                 wExt: this._size.width,
-                                hExt: this._size.width,
+                                hExt: this._size.height,
                                 xExt: this._size.width,
                                 yExt: this._size.height,
                                 mapMode: 8,
@@ -161,7 +164,7 @@ export class PictDestination extends DestinationTextBase {
         this.inst = inst;
     }
 
-    public handleKeyword(keyword: string, param: number) {
+    public handleKeyword(keyword: string, param: number): boolean {
         const handler = this._pictHandlers[keyword];
         if (handler != null) {
             handler(param);
@@ -194,11 +197,11 @@ export class PictDestination extends DestinationTextBase {
         return false;
     }
 
-    public handleBlob(blob: ArrayBuffer) {
+    public handleBlob(blob: ArrayBuffer): void {
         this._blob = blob;
     }
 
-    public apply(rendering = false) {
+    public apply(rendering = false): { isLegacy: boolean, element: HTMLElement } {
         if (this._type == null) {
             throw new RTFJSError("Picture type unknown or not specified");
         }
@@ -225,7 +228,7 @@ export class PictDestination extends DestinationTextBase {
                     if (typeof pictrender === "string") {
                         Helper.log("[pict] Could not load image: " + pictrender);
                         if (render) {
-                            return renderer.buildPicture(pictrender, null).getElement();
+                            return renderer.buildPicture(pictrender, null).getElement().get(0);
                         } else {
                             inst.addIns((rendererForPicture) => {
                                 rendererForPicture.picture(pictrender, null);
@@ -236,7 +239,7 @@ export class PictDestination extends DestinationTextBase {
                             throw new RTFJSError("Expected a picture render function");
                         }
                         if (render) {
-                            return renderer.buildRenderedPicture(pictrender()).getElement();
+                            return renderer.buildRenderedPicture(pictrender()).getElement().get(0);
                         } else {
                             inst.addIns((rendererForPicture) => {
                                 rendererForPicture.renderedPicture(pictrender());
@@ -248,13 +251,13 @@ export class PictDestination extends DestinationTextBase {
 
             if (this.inst._settings.onPicture != null) {
                 this.inst.addIns((renderer) => {
-                        const elem = this.inst._settings.onPicture(isLegacy, () => {
-                            return doRender(renderer, true);
-                        });
-                        if (elem != null) {
-                            renderer.appendElement(elem);
-                        }
+                    const elem = this.inst._settings.onPicture(isLegacy, () => {
+                        return doRender(renderer, true);
                     });
+                    if (elem != null) {
+                        renderer.appendElement(elem);
+                    }
+                });
             } else {
                 return {
                     isLegacy,
@@ -269,7 +272,7 @@ export class PictDestination extends DestinationTextBase {
                 const bin = blob != null ? Helper._blobToBinary(blob) : Helper._hexToBinary(text);
                 if (type !== "") {
                     if (render) {
-                        return renderer.buildPicture(type as string, bin).getElement();
+                        return renderer.buildPicture(type as string, bin).getElement().get(0);
                     } else {
                         renderer._doc.addIns((rendererForPicture) => {
                             rendererForPicture.picture(type as string, bin);
@@ -277,7 +280,7 @@ export class PictDestination extends DestinationTextBase {
                     }
                 } else {
                     if (render) {
-                        return renderer.buildPicture("Unsupported image format", null).getElement();
+                        return renderer.buildPicture("Unsupported image format", null).getElement().get(0);
                     } else {
                         renderer._doc.addIns((rendererForPicture) => {
                             rendererForPicture.picture("Unsupported image format", null);
@@ -288,13 +291,13 @@ export class PictDestination extends DestinationTextBase {
 
             if (this.inst._settings.onPicture != null) {
                 this.inst.addIns((renderer) => {
-                        const elem = this.inst._settings.onPicture(isLegacy, () => {
-                            return doRender(renderer, true);
-                        });
-                        if (elem != null) {
-                            renderer.appendElement(elem);
-                        }
+                    const elem = this.inst._settings.onPicture(isLegacy, () => {
+                        return doRender(renderer, true);
                     });
+                    if (elem != null) {
+                        renderer.appendElement(elem);
+                    }
+                });
             } else {
                 return {
                     isLegacy,

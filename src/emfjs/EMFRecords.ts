@@ -32,7 +32,7 @@ import { PointL, PointS, RectL, SizeL } from "./Primitives";
 import { Region } from "./Region";
 import { Brush, ColorRef, Pen } from "./Style";
 
-export class EmfHeader {
+class EmfHeader {
     private size: number;
     private bounds: RectL;
     private frame: RectL;
@@ -116,14 +116,14 @@ export class EmfHeader {
         }
     }
 
-    public toString() {
+    public toString(): string {
         return "{bounds: " + this.bounds.toString() + ", frame: " + this.frame.toString()
             + ", description: " + this.description + "}";
     }
 }
 
 export class EMFRecords {
-    private _records: Array<(gdi: GDIContext) => void>;
+    private _records: ((gdi: GDIContext) => void)[];
     private _header: EmfHeader;
 
     constructor(reader: Blob, first: number) {
@@ -584,7 +584,7 @@ export class EMFRecords {
         }
     }
 
-    public play(gdi: GDIContext) {
+    public play(gdi: GDIContext): void {
         const len = this._records.length;
         for (let i = 0; i < len; i++) {
             this._records[i](gdi);

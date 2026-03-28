@@ -1,8 +1,6 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-    mode: 'none',
     node: false,
     entry: {
         EMFJS: './src/emfjs/index.ts',
@@ -11,16 +9,19 @@ module.exports = {
     },
     devtool: 'source-map',
     resolve: {
-        extensions: [ '.ts', '.js' ],
+        extensions: ['.ts', '.js'],
         alias: {
-            EMFJS:  path.resolve(__dirname, '../src/emfjs/index.ts'),
-            WMFJS:  path.resolve(__dirname, '../src/wmfjs/index.ts'),
+            EMFJS: path.resolve(__dirname, '../src/emfjs/index.ts'),
+            WMFJS: path.resolve(__dirname, '../src/wmfjs/index.ts'),
         }
     },
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: '[name].bundle.js',
         library: '[name]',
+        // This is a workaround for https://github.com/webpack/webpack/issues/1194 because we
+        // use '[name]' for library and this breaks sourcemaps in firefox
+        devtoolNamespace: 'rtfjs',
         libraryTarget: 'umd',
         globalObject: 'this'
     },
@@ -36,29 +37,8 @@ module.exports = {
             commonjs2: './WMFJS.bundle.js',
             amd: './WMFJS.bundle.js',
             root: 'WMFJS'
-        },
-        jquery: {
-            commonjs: 'jquery',
-            commonjs2: 'jquery',
-            amd: 'jquery',
-            root: '$'
-        },
-        "jquery.svg": {
-            commonjs: './jquery.svg',
-            commonjs2: './jquery.svg',
-            amd: './jquery.svg',
-            root: '$'
-        },
-        "jquery.svgfilter": {
-            commonjs: './jquery.svgfilter',
-            commonjs2: './jquery.svgfilter',
-            amd: './jquery.svgfilter',
-            root: '$'
         }
     },
-    plugins: [
-        new CopyWebpackPlugin([{ from: 'vendor/jquery-svg', context: path.join(__dirname, '..'), force: true}])
-    ],
     stats: {
         modules: false
     }

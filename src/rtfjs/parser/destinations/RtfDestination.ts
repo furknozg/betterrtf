@@ -58,7 +58,11 @@ export class RtfDestination extends DestinationBase {
         },
         b: this._genericFormatOnOff("chp", "bold"),
         i: this._genericFormatOnOff("chp", "italic"),
+        sub: this._genericFormatSetVal("chp", "supersubscript", Helper.SUPERSUBSCRIPT.SUBSCRIPT),
+        super: this._genericFormatSetVal("chp", "supersubscript", Helper.SUPERSUBSCRIPT.SUPERSCRIPT),
+        nosupersub: this._genericFormatSetVal("chp", "supersubscript", Helper.SUPERSUBSCRIPT.NONE),
         cf: this._genericFormatSetValRequired("chp", "colorindex"),
+        highlight: this._genericFormatSetValRequired("chp", "highlightindex"),
         fs: this._genericFormatSetValRequired("chp", "fontsize"),
         f: this._genericFormatSetValRequired("chp", "fontfamily"),
         loch: this._genericFormatSetNoParam("pap", "charactertype", Helper.CHARACTER_TYPE.LOWANSI),
@@ -161,7 +165,9 @@ export class RtfDestination extends DestinationBase {
             this.parser.state.pap.intable = false;
         },
         cell: () => {
-            this._finishTableCell();
+            if (this.parser.state.table != null) {
+                this._finishTableCell();
+            }
         },
         clvmgf: () => {
             this.parser.state.table.setVerticalMergeStart();
@@ -233,32 +239,28 @@ export class RtfDestination extends DestinationBase {
         this.inst = inst;
     }
 
-    public addIns(func: (renderer: Renderer) => void) {
+    public addIns(func: (renderer: Renderer) => void): void {
         this.inst.addIns(func);
     }
 
-    public appendText(text: string) {
-        // this.flushProps();
+    public appendText(text: string): void {
         if (this.parser.state.pap.intable) {
             if (this.parser.state.table == null) {
-                throw new RTFJSError("intbl flag without table definition");
+                Helper.log("[rtf] ignoring dangling intbl flag without table definition");
             }
-        } else {
-            if (this.parser.state.table != null) {
-                Helper.log("[rtf] TABLE END");
-                this.parser.state.table = null;
-            }
+        } else if (this.parser.state.table != null) {
+            Helper.log("[rtf] TABLE END");
+            this.parser.state.table = null;
         }
-
         Helper.log("[rtf] output: " + text);
         this.inst.addIns(text);
     }
 
-    public sub() {
+    public sub(): void {
         Helper.log("[rtf].sub()");
     }
 
-    public handleKeyword(keyword: string, param: number) {
+    public handleKeyword(keyword: string, param: number): boolean {
         const handler = this._charFormatHandlers[keyword];
         if (handler != null) {
             handler(param);
@@ -267,7 +269,7 @@ export class RtfDestination extends DestinationBase {
         return false;
     }
 
-    public apply() {
+    public apply(): void {
         Helper.log("[rtf] apply()");
         this.flushProps();
         for (const prop in this._metadata) {
@@ -276,7 +278,7 @@ export class RtfDestination extends DestinationBase {
         delete this._metadata;
     }
 
-    public setMetadata(prop: string, val: any) {
+    public setMetadata(prop: string, val: any): void {
         this._metadata[prop] = val;
     }
 
@@ -289,18 +291,20 @@ export class RtfDestination extends DestinationBase {
     private _addFormatIns(ptype: string, props: Chp | Pap) {
         Helper.log("[rtf] update " + ptype);
         switch (ptype) {
-            case "chp":
+            case "chp": {
                 const chp = new Chp(props as Chp);
                 this.inst.addIns((renderer) => {
                     renderer.setChp(chp);
                 });
                 break;
-            case "pap":
+            }
+            case "pap": {
                 const pap = new Pap(props as Pap);
                 this.inst.addIns((renderer) => {
                     renderer.setPap(pap);
                 });
                 break;
+            }
         }
     }
 
