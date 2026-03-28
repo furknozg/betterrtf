@@ -122,11 +122,91 @@ export class RtfDestination extends DestinationBase {
         line: this._addInsHandler((renderer) => {
             renderer.lineBreak();
         }),
-        trowd: this._setTableVal(),
+        trowd: () => {
+            if (this.parser.state.table != null && this.parser.state.table.hasOpenRow()) {
+                this._finishTableRow();
+                this.parser.state.table.finalizeRow();
+            }
+
+            if (this.parser.state.table == null) {
+                this.parser.state.table = new Tbl();
+                Helper.log("[rtf] state.pap.table initialized");
+                const table = this.parser.state.table;
+                this.inst.addIns((renderer) => {
+                    renderer.pushContainer(new RenderTableContainer(renderer._doc, table));
+                });
+            }
+
+            this.parser.state.table.startRow();
+        },
+        trleft: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setRowLeft(param);
+        },
+        cellx: (param: number) => {
+            if (param == null) {
+                throw new RTFJSError("cellx without required param");
+            }
+            this.parser.state.table.setCellRight(param);
+        },
         intbl: this._genericFormatSetNoParam("pap", "intable", true),
-        row: this._genericFormatSetNoParam("pap", "isrow", true),
+        row: () => {
+            this.parser.state.pap.isrow = true;
+            if (this.parser.state.table != null) {
+                this._finishTableRow();
+                this.parser.state.table.finalizeRow();
+            }
+            this.parser.state.pap.intable = false;
+        },
         cell: () => {
             this._finishTableCell();
+        },
+        clvmgf: () => {
+            this.parser.state.table.setVerticalMergeStart();
+        },
+        clvmrg: () => {
+            this.parser.state.table.setVerticalMergeContinue();
+        },
+        clmgf: () => {
+            this.parser.state.table.setMergeStart();
+        },
+        clmrg: () => {
+            this.parser.state.table.setMergeContinue();
+        },
+        clbrdrt: () => {
+            this.parser.state.table.beginBorder("top");
+        },
+        clbrdrl: () => {
+            this.parser.state.table.beginBorder("left");
+        },
+        clbrdrb: () => {
+            this.parser.state.table.beginBorder("bottom");
+        },
+        clbrdrr: () => {
+            this.parser.state.table.beginBorder("right");
+        },
+        brdrs: () => {
+            this.parser.state.table.setBorderStyle("solid");
+        },
+        brdrth: () => {
+            this.parser.state.table.setBorderStyle("solid");
+        },
+        brdrdb: () => {
+            this.parser.state.table.setBorderStyle("double");
+        },
+        brdrw: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setBorderWidth(param);
+        },
+        brdrcf: (param: number) => {
+            if (param == null) {
+                return;
+            }
+            this.parser.state.table.setBorderColorIndex(param);
         },
     };
 
@@ -315,22 +395,4 @@ export class RtfDestination extends DestinationBase {
         };
     }
 
-    private _setTableVal(member?: string, defaultval?: number) {
-        return (param: number) => {
-            if (member != null) {
-                this.parser.state.table[member] = (param == null) ? defaultval : param;
-                Helper.log("[rtf] state.table." + member + " = " + this.parser.state.table[member].toString());
-            } else {
-                if (this.parser.state.table != null) {
-                    this._finishTableRow();
-                } else {
-                    this.parser.state.table = new Tbl();
-                    Helper.log("[rtf] state.pap.table initialized");
-                    this.inst.addIns( (renderer) => {
-                        renderer.pushContainer(new RenderTableContainer(renderer._doc));
-                    });
-                }
-            }
-        };
-    }
 }

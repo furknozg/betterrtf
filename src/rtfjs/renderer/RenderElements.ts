@@ -26,7 +26,15 @@ SOFTWARE.
 
 import { Document } from "../Document";
 import { Helper, RTFJSError } from "../Helper";
-import { Chp, Pap } from "../parser/Containers";
+import {
+    Chp,
+    ITableBorder,
+    ITableCell,
+    ITableRow,
+    Pap,
+    TableBorderSide,
+    Tbl,
+} from "../parser/Containers";
 
 export class RenderElement {
     public _doc: Document;
@@ -251,22 +259,24 @@ export class RenderParagraphContainer extends RenderContainer {
 }
 
 export interface IRow {
-    element: JQuery;
+    def: ITableRow;
     cells: ICell[];
 }
 
 export interface ICell {
-    element: JQuery;
+    def: ITableCell;
     sub: ISub[];
 }
 
 export class RenderTableContainer extends RenderContainer {
+    public _table: Tbl;
     public _rows: IRow[];
     public _row: IRow;
     public _cell: ICell;
 
-    constructor(doc: Document) {
+    constructor(doc: Document, table: Tbl) {
         super(doc, "table", $("<table>"), null);
+        this._table = table;
         this._rows = [];
         this._row = null;
         this._cell = null;
@@ -278,8 +288,15 @@ export class RenderTableContainer extends RenderContainer {
             this.appendRow();
         }
 
+        const cellIndex = this._row.cells.length;
+        const cellDef = this._row.def.cells[cellIndex] || {
+            left: 0,
+            right: 0,
+            borders: {},
+        };
+
         this._cell = {
-            element: $("<td>").appendTo(this._row.element),
+            def: cellDef,
             sub: [],
         };
         this._row.cells.push(this._cell);
@@ -287,12 +304,16 @@ export class RenderTableContainer extends RenderContainer {
 
     public appendRow() {
         Helper.log("[rtf] Table appending row");
+        const rowIndex = this._rows.length;
+        const rowDef = this._table.rows[rowIndex] || {
+            left: 0,
+            cells: [],
+        };
         this._row = {
-            element: $("<tr>").appendTo(this._element),
+            def: rowDef,
             cells: [],
         };
         this._rows.push(this._row);
-        this.appendCell();
     }
 
     public finishRow() {
@@ -304,21 +325,121 @@ export class RenderTableContainer extends RenderContainer {
     public finishCell() {
         Helper.log("[rtf] Table finish cell");
         const len = this._sub.length;
-        if (len > 0) {
-            if (this._row == null) {
-                this.appendRow();
-            }
-            if (this._cell == null) {
-                this.appendCell();
-            }
-
-            for (let i = 0; i < len; i++) {
-                this._cell.sub.push(this._sub[i]);
-            }
-            this._sub = [];
+        if (this._row == null) {
+            this.appendRow();
+        }
+        if (this._cell == null) {
+            this.appendCell();
         }
 
+        for (let i = 0; i < len; i++) {
+            this._cell.sub.push(this._sub[i]);
+        }
+        this._sub = [];
+
         this._cell = null;
+    }
+
+    private _getColumnBoundaries() {
+        const boundaries: {[key: string]: boolean} = {};
+        const rows = this._table.rows;
+        const rlen = rows.length;
+
+        for (let r = 0; r < rlen; r++) {
+            const row = rows[r];
+            boundaries[row.left.toString()] = true;
+            const clen = row.cells.length;
+            for (let c = 0; c < clen; c++) {
+                const cell = row.cells[c];
+                boundaries[cell.left.toString()] = true;
+                boundaries[cell.right.toString()] = true;
+            }
+        }
+
+        return Object.keys(boundaries).map((value) => parseInt(value, 10)).sort((a, b) => a - b);
+    }
+
+    private _getColumnIndex(boundaries: number[], value: number) {
+        for (let i = 0; i < boundaries.length; i++) {
+            if (boundaries[i] === value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private _getColSpan(boundaries: number[], cell: ITableCell, row: ITableRow, cellIndex: number) {
+        const start = this._getColumnIndex(boundaries, cell.left);
+        let end = this._getColumnIndex(boundaries, cell.right);
+        if (start < 0 || end < 0) {
+            return 1;
+        }
+
+        while (cell.mergeStart === true && cellIndex + 1 < row.cells.length) {
+            const next = row.cells[cellIndex + 1];
+            if (next.mergeContinue !== true) {
+                break;
+            }
+            end = this._getColumnIndex(boundaries, next.right);
+            cellIndex++;
+        }
+
+        return Math.max(1, end - start);
+    }
+
+    private _getRowSpan(rowIndex: number, cellIndex: number, boundaries: number[]) {
+        const row = this._table.rows[rowIndex];
+        const cell = row.cells[cellIndex];
+
+        if (cell.vMergeContinue === true) {
+            return 0;
+        }
+
+        let span = 1;
+        const start = this._getColumnIndex(boundaries, cell.left);
+        const end = this._getColumnIndex(boundaries, cell.right);
+
+        if (cell.vMergeStart !== true || start < 0 || end < 0) {
+            return span;
+        }
+
+        for (let r = rowIndex + 1; r < this._table.rows.length; r++) {
+            const nextRow = this._table.rows[r];
+            const nextCell = nextRow.cells[cellIndex];
+            if (nextCell == null || nextCell.vMergeContinue !== true) {
+                break;
+            }
+
+            const nextStart = this._getColumnIndex(boundaries, nextCell.left);
+            const nextEnd = this._getColumnIndex(boundaries, nextCell.right);
+            if (nextStart !== start || nextEnd !== end) {
+                break;
+            }
+            span++;
+        }
+
+        return span;
+    }
+
+    private _applyBorderStyle(element: JQuery, side: string, border: ITableBorder) {
+        if (border == null) {
+            return;
+        }
+
+        const style = border.style != null ? border.style : "solid";
+        const width = border.width != null ? Math.max(1, Math.ceil(border.width / 16)) : 1;
+        const color = border.colorindex != null ? this._doc._lookupColor(border.colorindex) : null;
+        const colorStr = color != null ? Helper._colorToStr(color) : "rgb(0,0,0)";
+        element.css("border-" + side, width + "px " + style + " " + colorStr);
+    }
+
+    private _applyCellStyle(element: JQuery, cell: ITableCell) {
+        element.css("vertical-align", "top");
+        const sides: TableBorderSide[] = ["top", "left", "bottom", "right"];
+        for (let i = 0; i < sides.length; i++) {
+            const side = sides[i];
+            this._applyBorderStyle(element, side, cell.borders[side]);
+        }
     }
 
     public finalize() {
@@ -327,14 +448,40 @@ export class RenderTableContainer extends RenderContainer {
             throw new RTFJSError("Table container already finalized");
         }
 
+        const boundaries = this._getColumnBoundaries();
+        this._element.css("border-collapse", "collapse");
+
         const rlen = this._rows.length;
         Helper.log("[rtf] Table finalize: #rows: " + rlen);
         for (let r = 0; r < rlen; r++) {
             const row = this._rows[r];
-            const clen = row.cells.length;
+            const rowElement = $("<tr>").appendTo(this._element);
+            const clen = row.def.cells.length;
             Helper.log("[rtf] Table finalize: row[" + r + "].#cells: " + clen);
             for (let c = 0; c < clen; c++) {
-                const cell = row.cells[c];
+                const cellDef = row.def.cells[c];
+                if (cellDef == null || cellDef.mergeContinue === true) {
+                    continue;
+                }
+
+                const rowSpan = this._getRowSpan(r, c, boundaries);
+                if (rowSpan === 0) {
+                    continue;
+                }
+
+                const cell = row.cells[c] || {
+                    def: cellDef,
+                    sub: [],
+                };
+                const cellElement = $("<td>").appendTo(rowElement);
+                const colSpan = this._getColSpan(boundaries, cellDef, row.def, c);
+                if (colSpan > 1) {
+                    cellElement.attr("colspan", colSpan);
+                }
+                if (rowSpan > 1) {
+                    cellElement.attr("rowspan", rowSpan);
+                }
+                this._applyCellStyle(cellElement, cellDef);
 
                 const slen = cell.sub.length;
                 Helper.log("[rtf] Table finalize: row[" + r + "].cell[" + c + "].#subs: " + slen);
@@ -342,7 +489,7 @@ export class RenderTableContainer extends RenderContainer {
                     const sub = cell.sub[s];
                     const element = sub.container.finalize();
                     if (element != null) {
-                        cell.element.append(element);
+                        cellElement.append(element);
                     }
                 }
             }

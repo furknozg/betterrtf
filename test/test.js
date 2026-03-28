@@ -41,6 +41,38 @@ function getTestFiles(testType) {
 
 describe("Test files", function() {
     var $_$twiz;
+    const tableRegressionRtf = String.raw`{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+{\colortbl;\red0\green0\blue0;}
+\pard
+\trowd\trql\trleft0
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx1000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2000
+\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2300
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx3300
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx4300
+\intbl\b Left\cell\intbl\cell\intbl\cell\intbl\b Right\cell\intbl\cell\row
+\trowd\trql\trleft0
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx1000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx1500
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2000
+\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2300
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx3300
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx3800
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx4300
+\intbl Left label\cell\intbl 1\cell\intbl (0-1)\cell\intbl\cell\intbl Right label\cell\intbl 2\cell\intbl (0-2)\cell\row
+\trowd\trql\trleft0
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx1000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\clvmgf\cellx3000
+\intbl Merge label\cell\intbl Merge value\cell\intbl rowspan start\cell\row
+\trowd\trql\trleft0
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx1000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\cellx2000
+\clbrdrt\brdrs\brdrw10\brdrcf1\clbrdrl\brdrs\brdrw10\brdrcf1\clbrdrb\brdrs\brdrw10\brdrcf1\clbrdrr\brdrs\brdrw10\brdrcf1\clvmrg\cellx3000
+\intbl Next label\cell\intbl Next value\cell\intbl\cell\row
+\pard
+}`;
 
     describe("rtf", function() {
         getTestFiles("rtf").forEach(function (testFile) {
@@ -76,6 +108,40 @@ describe("Test files", function() {
                     expect(testFile.expectedMetadata).to.deep.equal(result.metadata);
                 });
             });
+        });
+    });
+
+    describe("rtf table regression", function() {
+        this.timeout(0);
+        var result;
+
+        before(function(done) {
+            utils.runRtfjs(__dirname, tableRegressionRtf, function(meta, html, twiz) {
+                result = {
+                    html: html,
+                    metadata: JSON.parse(meta)
+                };
+                $_$twiz = twiz;
+                done();
+            }, function(error) {
+                var formattedError = new Error(error.message);
+                formattedError.stack = error.stack;
+                done(formattedError);
+            });
+        });
+
+        it("should preserve empty spacer cells for alignment", function() {
+            expect(result.html).to.contain("<td></td>");
+        });
+
+        it("should emit visible border styles", function() {
+            expect(result.html).to.contain("border-top: 2px solid rgb(0,0,0)");
+            expect(result.html).to.contain("border-right: 2px solid rgb(0,0,0)");
+        });
+
+        it("should emit rowspans for vertical merges", function() {
+            expect(result.html).to.contain('rowspan="2"');
+            expect(result.html).to.contain("rowspan start");
         });
     });
 

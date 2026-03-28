@@ -211,7 +211,13 @@ var DocumentFacade = /** @class */ (function () {
             .then(function () {
             return _this._renderer.buildDom();
         }).catch(function (error) {
-            throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["RTFJSError"](error);
+            if (error instanceof _Helper__WEBPACK_IMPORTED_MODULE_1__["RTFJSError"]) {
+                throw error;
+            }
+            if (error != null && typeof error.message === "string") {
+                throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["RTFJSError"](error.message);
+            }
+            throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["RTFJSError"](String(error));
         });
     };
     return DocumentFacade;
@@ -8145,13 +8151,116 @@ var Chp = /** @class */ (function () {
 
 var Tbl = /** @class */ (function () {
     function Tbl(parent) {
-        if (parent != null) {
-            this.intbl = parent.intbl;
-        }
-        else {
-            this.intbl = false;
-        }
+        this.intbl = parent != null ? parent.intbl : false;
+        this.rows = [];
+        this.currentRow = null;
+        this.currentCell = null;
+        this.activeBorderSide = null;
     }
+    Tbl.prototype.hasOpenRow = function () {
+        return this.currentRow != null;
+    };
+    Tbl.prototype.startRow = function () {
+        this.currentRow = {
+            left: 0,
+            cells: [],
+        };
+        this.currentCell = this._createCell(0);
+        this.activeBorderSide = null;
+    };
+    Tbl.prototype.finalizeRow = function () {
+        if (this.currentRow == null) {
+            return;
+        }
+        this.rows.push(this.currentRow);
+        this.currentRow = null;
+        this.currentCell = null;
+        this.activeBorderSide = null;
+    };
+    Tbl.prototype.setRowLeft = function (left) {
+        this._ensureRow();
+        this.currentRow.left = left;
+        if (this.currentCell != null && this.currentRow.cells.length === 0) {
+            this.currentCell.left = left;
+            this.currentCell.right = left;
+        }
+    };
+    Tbl.prototype.setCellRight = function (right) {
+        this._ensureRow();
+        this._ensureCell();
+        this.currentCell.right = right;
+        this.currentRow.cells.push(this.currentCell);
+        this.currentCell = this._createCell(right);
+        this.activeBorderSide = null;
+    };
+    Tbl.prototype.setMergeStart = function () {
+        this._ensureCell();
+        this.currentCell.mergeStart = true;
+    };
+    Tbl.prototype.setMergeContinue = function () {
+        this._ensureCell();
+        this.currentCell.mergeContinue = true;
+    };
+    Tbl.prototype.setVerticalMergeStart = function () {
+        this._ensureCell();
+        this.currentCell.vMergeStart = true;
+    };
+    Tbl.prototype.setVerticalMergeContinue = function () {
+        this._ensureCell();
+        this.currentCell.vMergeContinue = true;
+    };
+    Tbl.prototype.beginBorder = function (side) {
+        this._ensureCell();
+        if (this.currentCell.borders[side] == null) {
+            this.currentCell.borders[side] = {};
+        }
+        this.activeBorderSide = side;
+    };
+    Tbl.prototype.setBorderStyle = function (style) {
+        var border = this._getActiveBorder();
+        if (border != null) {
+            border.style = style;
+        }
+    };
+    Tbl.prototype.setBorderWidth = function (width) {
+        var border = this._getActiveBorder();
+        if (border != null) {
+            border.width = width;
+        }
+    };
+    Tbl.prototype.setBorderColorIndex = function (colorindex) {
+        var border = this._getActiveBorder();
+        if (border != null) {
+            border.colorindex = colorindex;
+        }
+    };
+    Tbl.prototype._ensureRow = function () {
+        if (this.currentRow == null) {
+            this.startRow();
+        }
+    };
+    Tbl.prototype._ensureCell = function () {
+        this._ensureRow();
+        if (this.currentCell == null) {
+            var prev = this.currentRow.cells[this.currentRow.cells.length - 1];
+            var left = prev != null ? prev.right : this.currentRow.left;
+            this.currentCell = this._createCell(left);
+        }
+    };
+    Tbl.prototype._getActiveBorder = function () {
+        if (this.activeBorderSide == null) {
+            return null;
+        }
+        this._ensureCell();
+        return this.currentCell.borders[this.activeBorderSide];
+    };
+    Tbl.prototype._createCell = function (left) {
+        return {
+            left: left,
+            right: left,
+            borders: {},
+        };
+    };
     return Tbl;
 }());
 
@@ -9293,8 +9402,9 @@ var RenderParagraphContainer = /** @class */ (function (_super) {
 
 var RenderTableContainer = /** @class */ (function (_super) {
     __extends(RenderTableContainer, _super);
-    function RenderTableContainer(doc) {
+    function RenderTableContainer(doc, table) {
         var _this = _super.call(this, doc, "table", $("<table>"), null) || this;
+        _this._table = table;
         _this._rows = [];
         _this._row = null;
         _this._cell = null;
@@ -9305,20 +9415,30 @@ var RenderTableContainer = /** @class */ (function (_super) {
         if (this._row == null) {
             this.appendRow();
         }
+        var cellIndex = this._row.cells.length;
+        var cellDef = this._row.def.cells[cellIndex] || {
+            left: 0,
+            right: 0,
+            borders: {},
+        };
         this._cell = {
-            element: $("<td>").appendTo(this._row.element),
+            def: cellDef,
             sub: [],
         };
         this._row.cells.push(this._cell);
     };
     RenderTableContainer.prototype.appendRow = function () {
         _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table appending row");
+        var rowIndex = this._rows.length;
+        var rowDef = this._table.rows[rowIndex] || {
+            left: 0,
+            cells: [],
+        };
         this._row = {
-            element: $("<tr>").appendTo(this._element),
+            def: rowDef,
             cells: [],
         };
         this._rows.push(this._row);
-        this.appendCell();
     };
     RenderTableContainer.prototype.finishRow = function () {
         _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finish row");
@@ -9328,40 +9448,146 @@ var RenderTableContainer = /** @class */ (function (_super) {
     RenderTableContainer.prototype.finishCell = function () {
         _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finish cell");
         var len = this._sub.length;
-        if (len > 0) {
-            if (this._row == null) {
-                this.appendRow();
-            }
-            if (this._cell == null) {
-                this.appendCell();
-            }
-            for (var i = 0; i < len; i++) {
-                this._cell.sub.push(this._sub[i]);
-            }
-            this._sub = [];
+        if (this._row == null) {
+            this.appendRow();
         }
+        if (this._cell == null) {
+            this.appendCell();
+        }
+        for (var i = 0; i < len; i++) {
+            this._cell.sub.push(this._sub[i]);
+        }
+        this._sub = [];
         this._cell = null;
+    };
+    RenderTableContainer.prototype._getColumnBoundaries = function () {
+        var boundaries = {};
+        var rows = this._table.rows;
+        var rlen = rows.length;
+        for (var r = 0; r < rlen; r++) {
+            var row = rows[r];
+            boundaries[row.left.toString()] = true;
+            var clen = row.cells.length;
+            for (var c = 0; c < clen; c++) {
+                var cell = row.cells[c];
+                boundaries[cell.left.toString()] = true;
+                boundaries[cell.right.toString()] = true;
+            }
+        }
+        return Object.keys(boundaries).map(function (value) { return parseInt(value, 10); }).sort(function (a, b) { return a - b; });
+    };
+    RenderTableContainer.prototype._getColumnIndex = function (boundaries, value) {
+        for (var i = 0; i < boundaries.length; i++) {
+            if (boundaries[i] === value) {
+                return i;
+            }
+        }
+        return -1;
+    };
+    RenderTableContainer.prototype._getColSpan = function (boundaries, cell, row, cellIndex) {
+        var start = this._getColumnIndex(boundaries, cell.left);
+        var end = this._getColumnIndex(boundaries, cell.right);
+        if (start < 0 || end < 0) {
+            return 1;
+        }
+        while (cell.mergeStart === true && cellIndex + 1 < row.cells.length) {
+            var next = row.cells[cellIndex + 1];
+            if (next.mergeContinue !== true) {
+                break;
+            }
+            end = this._getColumnIndex(boundaries, next.right);
+            cellIndex++;
+        }
+        return Math.max(1, end - start);
+    };
+    RenderTableContainer.prototype._getRowSpan = function (rowIndex, cellIndex, boundaries) {
+        var row = this._table.rows[rowIndex];
+        var cell = row.cells[cellIndex];
+        if (cell.vMergeContinue === true) {
+            return 0;
+        }
+        var span = 1;
+        var start = this._getColumnIndex(boundaries, cell.left);
+        var end = this._getColumnIndex(boundaries, cell.right);
+        if (cell.vMergeStart !== true || start < 0 || end < 0) {
+            return span;
+        }
+        for (var r = rowIndex + 1; r < this._table.rows.length; r++) {
+            var nextRow = this._table.rows[r];
+            var nextCell = nextRow.cells[cellIndex];
+            if (nextCell == null || nextCell.vMergeContinue !== true) {
+                break;
+            }
+            var nextStart = this._getColumnIndex(boundaries, nextCell.left);
+            var nextEnd = this._getColumnIndex(boundaries, nextCell.right);
+            if (nextStart !== start || nextEnd !== end) {
+                break;
+            }
+            span++;
+        }
+        return span;
+    };
+    RenderTableContainer.prototype._applyBorderStyle = function (element, side, border) {
+        if (border == null) {
+            return;
+        }
+        var style = border.style != null ? border.style : "solid";
+        var width = border.width != null ? Math.max(1, Math.ceil(border.width / 16)) : 1;
+        var color = border.colorindex != null ? this._doc._lookupColor(border.colorindex) : null;
+        var colorStr = color != null ? _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"]._colorToStr(color) : "rgb(0,0,0)";
+        element.css("border-" + side, width + "px " + style + " " + colorStr);
+    };
+    RenderTableContainer.prototype._applyCellStyle = function (element, cell) {
+        element.css("vertical-align", "top");
+        var sides = ["top", "left", "bottom", "right"];
+        for (var i = 0; i < sides.length; i++) {
+            var side = sides[i];
+            this._applyBorderStyle(element, side, cell.borders[side]);
+        }
     };
     RenderTableContainer.prototype.finalize = function () {
         _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finalize");
         if (this._sub == null) {
             throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["RTFJSError"]("Table container already finalized");
         }
+        var boundaries = this._getColumnBoundaries();
+        this._element.css("border-collapse", "collapse");
         var rlen = this._rows.length;
         _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finalize: #rows: " + rlen);
         for (var r = 0; r < rlen; r++) {
             var row = this._rows[r];
-            var clen = row.cells.length;
+            var rowElement = $("<tr>").appendTo(this._element);
+            var clen = row.def.cells.length;
             _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finalize: row[" + r + "].#cells: " + clen);
             for (var c = 0; c < clen; c++) {
-                var cell = row.cells[c];
+                var cellDef = row.def.cells[c];
+                if (cellDef == null || cellDef.mergeContinue === true) {
+                    continue;
+                }
+                var rowSpan = this._getRowSpan(r, c, boundaries);
+                if (rowSpan === 0) {
+                    continue;
+                }
+                var cell = row.cells[c] || {
+                    def: cellDef,
+                    sub: [],
+                };
+                var cellElement = $("<td>").appendTo(rowElement);
+                var colSpan = this._getColSpan(boundaries, cellDef, row.def, c);
+                if (colSpan > 1) {
+                    cellElement.attr("colspan", colSpan);
+                }
+                if (rowSpan > 1) {
+                    cellElement.attr("rowspan", rowSpan);
+                }
+                this._applyCellStyle(cellElement, cellDef);
                 var slen = cell.sub.length;
                 _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] Table finalize: row[" + r + "].cell[" + c + "].#subs: " + slen);
                 for (var s = 0; s < slen; s++) {
                     var sub = cell.sub[s];
                     var element = sub.container.finalize();
                     if (element != null) {
-                        cell.element.append(element);
+                        cellElement.append(element);
                     }
                 }
             }
@@ -10201,11 +10427,89 @@ var RtfDestination = /** @class */ (function (_super) {
             line: _this._addInsHandler(function (renderer) {
                 renderer.lineBreak();
             }),
-            trowd: _this._setTableVal(),
+            trowd: function () {
+                if (_this.parser.state.table != null && _this.parser.state.table.hasOpenRow()) {
+                    _this._finishTableRow();
+                    _this.parser.state.table.finalizeRow();
+                }
+                if (_this.parser.state.table == null) {
+                    _this.parser.state.table = new _Containers__WEBPACK_IMPORTED_MODULE_2__["Tbl"]();
+                    _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] state.pap.table initialized");
+                    var table_1 = _this.parser.state.table;
+                    _this.inst.addIns(function (renderer) {
+                        renderer.pushContainer(new _renderer_RenderElements__WEBPACK_IMPORTED_MODULE_1__["RenderTableContainer"](renderer._doc, table_1));
+                    });
+                }
+                _this.parser.state.table.startRow();
+            },
+            trleft: function (param) {
+                if (param == null) {
+                    return;
+                }
+                _this.parser.state.table.setRowLeft(param);
+            },
+            cellx: function (param) {
+                if (param == null) {
+                    throw new _Helper__WEBPACK_IMPORTED_MODULE_0__["RTFJSError"]("cellx without required param");
+                }
+                _this.parser.state.table.setCellRight(param);
+            },
             intbl: _this._genericFormatSetNoParam("pap", "intable", true),
-            row: _this._genericFormatSetNoParam("pap", "isrow", true),
+            row: function () {
+                _this.parser.state.pap.isrow = true;
+                if (_this.parser.state.table != null) {
+                    _this._finishTableRow();
+                    _this.parser.state.table.finalizeRow();
+                }
+                _this.parser.state.pap.intable = false;
+            },
             cell: function () {
                 _this._finishTableCell();
+            },
+            clvmgf: function () {
+                _this.parser.state.table.setVerticalMergeStart();
+            },
+            clvmrg: function () {
+                _this.parser.state.table.setVerticalMergeContinue();
+            },
+            clmgf: function () {
+                _this.parser.state.table.setMergeStart();
+            },
+            clmrg: function () {
+                _this.parser.state.table.setMergeContinue();
+            },
+            clbrdrt: function () {
+                _this.parser.state.table.beginBorder("top");
+            },
+            clbrdrl: function () {
+                _this.parser.state.table.beginBorder("left");
+            },
+            clbrdrb: function () {
+                _this.parser.state.table.beginBorder("bottom");
+            },
+            clbrdrr: function () {
+                _this.parser.state.table.beginBorder("right");
+            },
+            brdrs: function () {
+                _this.parser.state.table.setBorderStyle("solid");
+            },
+            brdrth: function () {
+                _this.parser.state.table.setBorderStyle("solid");
+            },
+            brdrdb: function () {
+                _this.parser.state.table.setBorderStyle("double");
+            },
+            brdrw: function (param) {
+                if (param == null) {
+                    return;
+                }
+                _this.parser.state.table.setBorderWidth(param);
+            },
+            brdrcf: function (param) {
+                if (param == null) {
+                    return;
+                }
+                _this.parser.state.table.setBorderColorIndex(param);
             },
         };
         if (parser.version != null) {
@@ -10377,27 +10681,6 @@ var RtfDestination = /** @class */ (function (_super) {
             members[member] = (param == null) ? defaultval : param;
             _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] state." + ptype + "." + prop + "." + member + " = " + members[member].toString());
             _this._updateFormatIns(ptype, props);
-        };
-    };
-    RtfDestination.prototype._setTableVal = function (member, defaultval) {
-        var _this = this;
-        return function (param) {
-            if (member != null) {
-                _this.parser.state.table[member] = (param == null) ? defaultval : param;
-                _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] state.table." + member + " = " + _this.parser.state.table[member].toString());
-            }
-            else {
-                if (_this.parser.state.table != null) {
-                    _this._finishTableRow();
-                }
-                else {
-                    _this.parser.state.table = new _Containers__WEBPACK_IMPORTED_MODULE_2__["Tbl"]();
-                    _Helper__WEBPACK_IMPORTED_MODULE_0__["Helper"].log("[rtf] state.pap.table initialized");
-                    _this.inst.addIns(function (renderer) {
-                        renderer.pushContainer(new _renderer_RenderElements__WEBPACK_IMPORTED_MODULE_1__["RenderTableContainer"](renderer._doc));
-                    });
-                }
-            }
         };
     };
     return RtfDestination;

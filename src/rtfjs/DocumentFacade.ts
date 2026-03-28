@@ -57,7 +57,13 @@ export class DocumentFacade {
             .then(() => {
                 return this._renderer.buildDom();
             }).catch((error) => {
-                throw new RTFJSError(error);
+                if (error instanceof RTFJSError) {
+                    throw error;
+                }
+                if (error != null && typeof error.message === "string") {
+                    throw new RTFJSError(error.message);
+                }
+                throw new RTFJSError(String(error));
             });
     }
 

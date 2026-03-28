@@ -28,6 +28,29 @@ import { Helper } from "../Helper";
 import { Renderer } from "../renderer/Renderer";
 import { IDestination } from "./destinations/DestinationBase";
 
+export type TableBorderSide = "top" | "left" | "bottom" | "right";
+
+export interface ITableBorder {
+    style?: string;
+    width?: number;
+    colorindex?: number;
+}
+
+export interface ITableCell {
+    left: number;
+    right: number;
+    mergeStart?: boolean;
+    mergeContinue?: boolean;
+    vMergeStart?: boolean;
+    vMergeContinue?: boolean;
+    borders: {[key in TableBorderSide]?: ITableBorder};
+}
+
+export interface ITableRow {
+    left: number;
+    cells: ITableCell[];
+}
+
 export class Chp {
     public bold: boolean;
     public underline: string;
@@ -62,14 +85,139 @@ export class Chp {
 
 export class Tbl {
     public intbl: boolean;
+    public rows: ITableRow[];
+    public currentRow: ITableRow;
+    public currentCell: ITableCell;
+    public activeBorderSide: TableBorderSide;
     [key: string]: any;
 
     constructor(parent?: Tbl) {
-        if (parent != null) {
-            this.intbl = parent.intbl;
-        } else {
-            this.intbl = false;
+        this.intbl = parent != null ? parent.intbl : false;
+        this.rows = [];
+        this.currentRow = null;
+        this.currentCell = null;
+        this.activeBorderSide = null;
+    }
+
+    public hasOpenRow() {
+        return this.currentRow != null;
+    }
+
+    public startRow() {
+        this.currentRow = {
+            left: 0,
+            cells: [],
+        };
+        this.currentCell = this._createCell(0);
+        this.activeBorderSide = null;
+    }
+
+    public finalizeRow() {
+        if (this.currentRow == null) {
+            return;
         }
+        this.rows.push(this.currentRow);
+        this.currentRow = null;
+        this.currentCell = null;
+        this.activeBorderSide = null;
+    }
+
+    public setRowLeft(left: number) {
+        this._ensureRow();
+        this.currentRow.left = left;
+        if (this.currentCell != null && this.currentRow.cells.length === 0) {
+            this.currentCell.left = left;
+            this.currentCell.right = left;
+        }
+    }
+
+    public setCellRight(right: number) {
+        this._ensureRow();
+        this._ensureCell();
+        this.currentCell.right = right;
+        this.currentRow.cells.push(this.currentCell);
+        this.currentCell = this._createCell(right);
+        this.activeBorderSide = null;
+    }
+
+    public setMergeStart() {
+        this._ensureCell();
+        this.currentCell.mergeStart = true;
+    }
+
+    public setMergeContinue() {
+        this._ensureCell();
+        this.currentCell.mergeContinue = true;
+    }
+
+    public setVerticalMergeStart() {
+        this._ensureCell();
+        this.currentCell.vMergeStart = true;
+    }
+
+    public setVerticalMergeContinue() {
+        this._ensureCell();
+        this.currentCell.vMergeContinue = true;
+    }
+
+    public beginBorder(side: TableBorderSide) {
+        this._ensureCell();
+        if (this.currentCell.borders[side] == null) {
+            this.currentCell.borders[side] = {};
+        }
+        this.activeBorderSide = side;
+    }
+
+    public setBorderStyle(style: string) {
+        const border = this._getActiveBorder();
+        if (border != null) {
+            border.style = style;
+        }
+    }
+
+    public setBorderWidth(width: number) {
+        const border = this._getActiveBorder();
+        if (border != null) {
+            border.width = width;
+        }
+    }
+
+    public setBorderColorIndex(colorindex: number) {
+        const border = this._getActiveBorder();
+        if (border != null) {
+            border.colorindex = colorindex;
+        }
+    }
+
+    private _ensureRow() {
+        if (this.currentRow == null) {
+            this.startRow();
+        }
+    }
+
+    private _ensureCell() {
+        this._ensureRow();
+        if (this.currentCell == null) {
+            const prev = this.currentRow.cells[this.currentRow.cells.length - 1];
+            const left = prev != null ? prev.right : this.currentRow.left;
+            this.currentCell = this._createCell(left);
+        }
+    }
+
+    private _getActiveBorder() {
+        if (this.activeBorderSide == null) {
+            return null;
+        }
+        this._ensureCell();
+        return this.currentCell.borders[this.activeBorderSide];
+    }
+
+    private _createCell(left: number): ITableCell {
+        return {
+            left,
+            right: left,
+            borders: {},
+        };
     }
 }
 
