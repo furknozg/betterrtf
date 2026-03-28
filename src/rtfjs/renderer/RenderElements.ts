@@ -447,15 +447,7 @@ export class RenderTableContainer extends RenderContainer {
     }
 
     private _applyBorderStyle(element: JQuery, side: string, border: ITableBorder) {
-        if (border == null) {
-            return;
-        }
-
-        const style = border.style != null ? border.style : "solid";
-        const width = border.width != null ? Math.max(1, Math.ceil(border.width / 16)) : 1;
-        const color = border.colorindex != null ? this._doc._lookupColor(border.colorindex) : null;
-        const colorStr = color != null ? Helper._colorToStr(color) : "rgb(0,0,0)";
-        element.css("border-" + side, width + "px " + style + " " + colorStr);
+        return;
     }
 
     private _applyCellStyle(element: JQuery, cell: ITableCell) {
@@ -474,7 +466,6 @@ export class RenderTableContainer extends RenderContainer {
         }
 
         const boundaries = this._getColumnBoundaries();
-        this._element.css("border-collapse", "collapse");
 
         const rlen = this._rows.length;
         Helper.log("[rtf] Table finalize: #rows: " + rlen);

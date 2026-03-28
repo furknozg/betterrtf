@@ -21114,14 +21114,7 @@ var RenderTableContainer = /** @class */ (function (_super) {
         return span;
     };
     RenderTableContainer.prototype._applyBorderStyle = function (element, side, border) {
-        if (border == null) {
-            return;
-        }
-        var style = border.style != null ? border.style : "solid";
-        var width = border.width != null ? Math.max(1, Math.ceil(border.width / 16)) : 1;
-        var color = border.colorindex != null ? this._doc._lookupColor(border.colorindex) : null;
-        var colorStr = color != null ? _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"]._colorToStr(color) : "rgb(0,0,0)";
-        element.css("border-" + side, width + "px " + style + " " + colorStr);
+        return;
     };
     RenderTableContainer.prototype._applyCellStyle = function (element, cell) {
         element.css("vertical-align", "top");
@@ -21137,7 +21130,6 @@ var RenderTableContainer = /** @class */ (function (_super) {
             throw new _Helper__WEBPACK_IMPORTED_MODULE_1__["RTFJSError"]("Table container already finalized");
         }
         var boundaries = this._getColumnBoundaries();
-        this._element.css("border-collapse", "collapse");
         var rlen = this._rows.length;
         _Helper__WEBPACK_IMPORTED_MODULE_1__["Helper"].log("[rtf] Table finalize: #rows: " + rlen);
         for (var r = 0; r < rlen; r++) {
