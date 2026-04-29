@@ -26,7 +26,7 @@ SOFTWARE.
 
 import * as $ from "jquery";
 import { Document } from "../Document";
-import { RTFJSError } from "../Helper";
+import { Helper, RTFJSError } from "../Helper";
 import { Chp, Pap } from "../parser/Containers";
 import {
     RenderContainer, RenderElement, RenderParagraphContainer, RenderTableContainer,
@@ -115,6 +115,8 @@ export class Renderer {
 
     public _appendToPar(content: RenderElement | null, newsubpar?: boolean) {
         if (newsubpar === true) {
+            Helper.log("[rtf][renderer] split paragraph currentIdx=" + this._cursubparIdx
+                + " pap.justification=" + (this._pap != null ? this._pap.justification : "null"));
             // Move everything in _curpar since the last sub-paragraph into a new one
             let par = new RenderParagraphContainer(this._doc);
             const len = this._curpar.length;
@@ -124,11 +126,13 @@ export class Renderer {
             this._curpar.splice(this._cursubparIdx + 1, len - this._cursubparIdx - 1);
             par.updateProps(this._pap, this._chp);
             this._curpar.push(par);
+            Helper.log("[rtf][renderer] finalized split container par#" + par._debugId);
 
             // Add a new sub-paragraph
             par = new RenderParagraphContainer(this._doc);
             this._cursubparIdx = this._curpar.push(par) - 1;
             par.updateProps(this._pap, this._chp);
+            Helper.log("[rtf][renderer] new active paragraph par#" + par._debugId);
 
             if (content != null) {
                 this._curpar.push(content);
@@ -138,6 +142,7 @@ export class Renderer {
                 const par = new RenderParagraphContainer(this._doc);
                 this._cursubparIdx = this._curpar.push(par) - 1;
                 par.updateProps(this._pap, this._chp);
+                Helper.log("[rtf][renderer] created initial active paragraph par#" + par._debugId);
             }
             if (this._curcont.length > 0 && this._curcont[this._curcont.length - 1] instanceof RenderTableContainer
                 && this._pap.intable === false) {
@@ -156,10 +161,12 @@ export class Renderer {
     }
 
     public finishPar(): void {
+        Helper.log("[rtf][renderer] finishPar()");
         this._appendToPar(null, true);
     }
 
     public lineBreak(): void {
+        Helper.log("[rtf][renderer] lineBreak()");
         this._appendToPar(null, true);
     }
 
@@ -180,13 +187,19 @@ export class Renderer {
     }
 
     public setChp(chp: Chp): void {
-        this._chp = chp;
+        this._chp = chp != null ? new Chp(chp) : null;
+        Helper.log("[rtf][renderer] setChp fontsize=" + (this._chp != null ? this._chp.fontsize : "null"));
     }
 
     public setPap(pap: Pap): void {
-        this._pap = pap;
+        this._pap = pap != null ? new Pap(pap) : null;
+        Helper.log("[rtf][renderer] setPap justification="
+            + (this._pap != null ? this._pap.justification : "null")
+            + " currentIdx=" + this._cursubparIdx);
         if (this._cursubparIdx >= 0) {
-            this._curpar[this._cursubparIdx].updateProps(this._pap, this._chp);
+            const paragraph = this._curpar[this._cursubparIdx] as RenderParagraphContainer;
+            Helper.log("[rtf][renderer] applying setPap to active paragraph par#" + paragraph._debugId);
+            paragraph.updateProps(this._pap, this._chp);
         }
     }
 

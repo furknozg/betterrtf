@@ -73,6 +73,21 @@ describe("Test files", function() {
 \intbl Next label\cell\intbl Next value\cell\intbl\cell\row
 \pard
 }`;
+    const lineAlignmentRegressionRtf = String.raw`{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\pard\ql\f0\fs24 First\line
+Second\line
+\qc Center\par
+}`;
+    const paragraphAlignmentRegressionRtf = String.raw`{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\pard\ql\f0\fs24 Heading 1\par
+\pard\ql\f0\fs24 This is the first normal paragraph!\par
+\pard\ql\f0\fs24 This is a chunk of normal text.\par
+\pard\qc\f0\fs24 This is a second paragraph.\par
+\pard\qc\f0\fs24 This is text with embedded bold, italic, and underline styles.\par
+\pard\qc\f0\fs24 Here is the anchor style. And here is the Image style.\par
+}`;
 
     describe("rtf", function() {
         getTestFiles("rtf").forEach(function (testFile) {
@@ -142,6 +157,64 @@ describe("Test files", function() {
         it("should emit rowspans for vertical merges", function() {
             expect(result.html).to.contain('rowspan="2"');
             expect(result.html).to.contain("rowspan start");
+        });
+    });
+
+    describe("rtf line alignment regression", function() {
+        this.timeout(0);
+        var result;
+
+        before(function(done) {
+            utils.runRtfjs(__dirname, lineAlignmentRegressionRtf, function(meta, html, twiz) {
+                result = {
+                    html: html,
+                    metadata: JSON.parse(meta)
+                };
+                $_$twiz = twiz;
+                done();
+            }, function(error) {
+                var formattedError = new Error(error.message);
+                formattedError.stack = error.stack;
+                done(formattedError);
+            });
+        });
+
+        it("should apply alignment to each rendered line independently", function() {
+            expect(result.html).to.contain('text-align: left;">\n<span style="font-family: Arial; font-size: 12pt;">First');
+            expect(result.html).to.contain('text-align: left;">\n<span style="font-family: Arial; font-size: 12pt;">Second');
+            expect(result.html).to.contain('text-align: center;">\n<span style="font-family: Arial; font-size: 12pt;">Center');
+        });
+    });
+
+    describe("rtf paragraph alignment regression", function() {
+        this.timeout(0);
+        var result;
+
+        before(function(done) {
+            utils.runRtfjs(__dirname, paragraphAlignmentRegressionRtf, function(meta, html, twiz) {
+                result = {
+                    html: html,
+                    metadata: JSON.parse(meta)
+                };
+                $_$twiz = twiz;
+                done();
+            }, function(error) {
+                var formattedError = new Error(error.message);
+                formattedError.stack = error.stack;
+                done(formattedError);
+            });
+        });
+
+        it("should keep early paragraphs left aligned when later paragraphs are centered", function() {
+            expect(result.html).to.contain('text-align: left;">\n<span style="font-family: Arial; font-size: 12pt;">Heading 1');
+            expect(result.html).to.contain('text-align: left;">\n<span style="font-family: Arial; font-size: 12pt;">This is the first normal paragraph!');
+            expect(result.html).to.contain('text-align: left;">\n<span style="font-family: Arial; font-size: 12pt;">This is a chunk of normal text.');
+        });
+
+        it("should center only the paragraphs that explicitly request center alignment", function() {
+            expect(result.html).to.contain('text-align: center;">\n<span style="font-family: Arial; font-size: 12pt;">This is a second paragraph.');
+            expect(result.html).to.contain('text-align: center;">\n<span style="font-family: Arial; font-size: 12pt;">This is text with embedded bold, italic, and underline styles.');
+            expect(result.html).to.contain('text-align: center;">\n<span style="font-family: Arial; font-size: 12pt;">Here is the anchor style. And here is the Image style.');
         });
     });
 

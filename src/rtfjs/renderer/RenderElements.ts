@@ -47,6 +47,16 @@ function normalizeElement(element: JQuery | HTMLElement): JQuery {
     return $(element as HTMLElement);
 }
 
+function clonePap(pap: Pap): Pap {
+    return pap != null ? new Pap(pap) : null;
+}
+
+function cloneChp(chp: Chp): Chp {
+    return chp != null ? new Chp(chp) : null;
+}
+
+let nextParagraphDebugId = 1;
+
 export class RenderElement {
     public _doc: Document;
     public _type: string;
@@ -71,8 +81,8 @@ export class RenderElement {
     }
 
     public updateProps(pap: Pap, chp: Chp) {
-        this._pap = pap;
-        this._chp = chp;
+        this._pap = clonePap(pap);
+        this._chp = cloneChp(chp);
     }
 
     public finalize() {
@@ -84,7 +94,7 @@ export class RenderElement {
 export class RenderTextElement extends RenderElement {
     constructor(doc: Document, text: string, chp: Chp) {
         super(doc, "text", $("<span>").text(text));
-        this._chp = chp != null ? chp : new Chp(null);
+        this._chp = new Chp(chp);
     }
 
     public applyProps() {
@@ -200,36 +210,46 @@ export class RenderContainer extends RenderElement {
 }
 
 export class RenderParagraphContainer extends RenderContainer {
+    public _debugId: number;
+    public _layoutPap: Pap;
+
     constructor(doc: Document) {
         const par = $("<div>");
         super(doc, "par", par, par);
+        this._debugId = nextParagraphDebugId++;
+        this._layoutPap = null;
+        Helper.log("[rtf][par#" + this._debugId + "] created");
     }
 
     public appendSub(container: RenderElement) {
         Helper.log("[rtf] appendSub for container " + this._type);
+        const pap = container._pap != null ? container._pap : this._pap;
+        const chp = container._chp != null ? container._chp : this._chp;
+        Helper.log("[rtf][par#" + this._debugId + "] appendSub child=" + container._type
+            + " pap.justification=" + (pap != null ? pap.justification : "null"));
+        if (this._layoutPap == null) {
+            this._layoutPap = clonePap(pap);
+        }
         this._sub.push({
             container,
-            pap: container._pap != null ? container._pap : this._pap,
-            chp: container._chp != null ? container._chp : this._chp,
+            pap: clonePap(pap),
+            chp: cloneChp(chp),
         });
     }
 
     public updateProps(pap: Pap, chp: Chp) {
-        this._pap = pap;
-        this._chp = chp;
-
-        if (this._sub.length > 0) {
-            const sub = this._sub[this._sub.length - 1];
-            sub.pap = pap;
-            sub.chp = chp;
-        }
+        this._pap = clonePap(pap);
+        this._chp = cloneChp(chp);
+        Helper.log("[rtf][par#" + this._debugId + "] updateProps justification="
+            + (this._pap != null ? this._pap.justification : "null")
+            + " spacebefore=" + (this._pap != null ? this._pap.spacebefore : "null")
+            + " spaceafter=" + (this._pap != null ? this._pap.spaceafter : "null"));
     }
 
     public applyPap(el: JQuery, pap: Pap, chp: Chp) {
         pap = pap != null ? pap : new Pap(null);
         Helper.log("[rtf] RenderParagraphContainer applyPap: chp=" + JSON.stringify(chp)
             + " pap=" + JSON.stringify(pap));
-        el = this.getElement();
 
         if (pap.spacebefore !== 0) {
             el.css("margin-top", Helper._twipsToPt(pap.spacebefore) + "pt");
@@ -262,20 +282,31 @@ export class RenderParagraphContainer extends RenderContainer {
     }
 
     public _finalizeSub(sub: ISub, parentPap: Pap) {
-        const element = sub.container.finalize();
-        if (element) {
-            this.applyPap(element, sub.pap ? sub.pap : parentPap, sub.chp);
-        }
-        return element;
+        return sub.container.finalize();
     }
 
     public finalize() {
-        Helper.log("[rtf] finalizing paragraph");
+        Helper.log("[rtf][par#" + this._debugId + "] finalizing paragraph with justification="
+            + (this._pap != null ? this._pap.justification : "null")
+            + " subCount=" + (this._sub != null ? this._sub.length : -1));
         if (this._sub == null) {
             throw new RTFJSError("Paragraph already finalized");
         }
         if (this._sub.length > 0) {
-            return super.finalize();
+            const layoutPap = this._layoutPap != null ? this._layoutPap : this._pap;
+            let layoutChp = this._chp;
+            for (let i = 0; i < this._sub.length; i++) {
+                const subChp = this._sub[i].chp;
+                if (subChp == null) {
+                    continue;
+                }
+                if (layoutChp == null || subChp.fontsize > layoutChp.fontsize) {
+                    layoutChp = subChp;
+                }
+            }
+            const element = super.finalize();
+            this.applyPap(element, layoutPap, layoutChp);
+            return element;
         }
 
         delete this._sub;
@@ -305,6 +336,7 @@ export class RenderTableContainer extends RenderContainer {
         this._rows = [];
         this._row = null;
         this._cell = null;
+        this._element.css("border-collapse", "collapse");
     }
 
     public appendCell() {
@@ -447,7 +479,27 @@ export class RenderTableContainer extends RenderContainer {
     }
 
     private _applyBorderStyle(element: JQuery, side: string, border: ITableBorder) {
-        return;
+        if (border == null || border.style == null || border.style === "") {
+            return;
+        }
+
+        let cssStyle = border.style;
+        if (cssStyle === "double") {
+            cssStyle = "double";
+        } else {
+            cssStyle = "solid";
+        }
+
+        const cssWidth = Math.max(1, Math.round((border.width || 0) / 15)) + "px";
+        let cssColor = "rgb(0,0,0)";
+        if (border.colorindex != null) {
+            const color = this._doc._lookupColor(border.colorindex);
+            if (color != null) {
+                cssColor = Helper._colorToStr(color);
+            }
+        }
+
+        element.css("border-" + side, cssWidth + " " + cssStyle + " " + cssColor);
     }
 
     private _applyCellStyle(element: JQuery, cell: ITableCell) {
